@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -15,7 +16,9 @@ std::vector<int> read_expense_report() {
 }
 
 int main(int argc, char *argv[]) {
-  std::vector<int> expenses = read_expense_report();
+  std::chrono::high_resolution_clock::time_point t1 =
+      std::chrono::high_resolution_clock::now();
+  double tic std::vector<int> expenses = read_expense_report();
 
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
     auto sum_2020 = find_sum_2020p1(expenses);
@@ -26,5 +29,10 @@ int main(int argc, char *argv[]) {
   } else {
     throw std::runtime_error{"Invalid argument!"};
   }
+  std::chrono::high_resolution_clock::time_point t1 =
+      std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> time_span =
+      std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+  std::cout << "Runtime: " << time_span.count() << '\n';
   return 0;
 }
