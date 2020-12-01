@@ -7,7 +7,7 @@ day1: day1.o $(DepsDay1)
 	make clean
 
 day1.o: day1.cpp
-	g++ -c src/main/day1.cpp
+	g++ -c -std=c++20 src/main/day1.cpp
 
 ## Object files compiled from src/
 file_to_vec.o: src/file_to_vec.cpp
