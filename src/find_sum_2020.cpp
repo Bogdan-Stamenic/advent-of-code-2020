@@ -1,8 +1,8 @@
 #include <iostream>
-#include <span>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <span>
 
 int find_sum_2020p1(std::span<int> int_span) {
   for (auto &i : int_span) {

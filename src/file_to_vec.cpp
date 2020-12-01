@@ -8,7 +8,6 @@ std::vector<int> file_to_int_vec(std::string file_name)
 	std::ifstream input_stream;
 	std::string line;
 	std::vector<int> output_vec;
-	std::cout << file_name << std::endl;
 	
 	input_stream.open(file_name);
 	if (input_stream.is_open()) {
