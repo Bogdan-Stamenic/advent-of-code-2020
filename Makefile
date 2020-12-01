@@ -14,7 +14,7 @@ file_to_vec.o: src/file_to_vec.cpp
 	g++ -c src/file_to_vec.cpp
 
 find_sum_2020.o: src/find_sum_2020.cpp
-	g++ -c src/find_sum_2020.cpp
+	g++ -c -std=c++20 src/find_sum_2020.cpp
 
 clean: FORCE
 	rm *.o
