@@ -7,36 +7,61 @@
 #include <vector>
 
 struct policy {
-  std::vector<int> limits;
+  std::vector<std::string> limits;
   std::string policy;
   std::string password;
 };
 
 std::vector<std::string> file_to_string_vec(std::string file_name);
-const policy parse_password_policy(std::string password_and_policy_from_file) {
-  /* Delimiters: "-", " ", ": " */
-  std::vector<std::regex> match_this = {
-      std::regex("^[0-9]+"), std::regex("[0-9]+(?=[[:space:]])"),
-      std::regex("[a-z]{1}(?=:)"), std::regex("[a-z]+$")};
-  std::vector<std::string> helper;
-  std::smatch sm;
 
-  for (auto exp : match_this) {
-    std::regex_search(password_and_policy_from_file, sm, exp);
-    helper.push_back(sm[0].str());
+std::vector<std::string> find_matches(std::string s, std::regex e) {
+  std::smatch m;
+  std::vector<std::string> matches;
+  while (std::regex_search(s, m, e)) {
+    matches.push_back(m.str(1));
+    s = m.suffix().str();
   }
-  policy parsed = {.limits = {helper[0], helper[1]},
-                   .policy = helper[2],
-                   .password = helper[3]};
-  return parsed;
-  // throw std::runtime_error("Error: couldn't find any matches.");
+  return matches;
 }
 
-/* Replace all non-policy chars and search the remaining string for a match */
-// bool check_password(policy entry){
-// 	auto const exp = std::regex("^" + entry.policy + "{" + entry.limits[0] +
-// "," + entry.limits[1] + "}$"); 	return std::regex_search(entry.password, exp);
-// }
+std::vector<policy> setup_policy_test(std::vector<std::string> input) {
+  std::vector<policy> output;
+  for (auto a : input) {
+    std::vector<std::string> helper =
+        find_matches(a, std::regex("(([[:digit:]]+(?![[:digit:]]))|([a-z]{1}(?!"
+                                   "[[:alpha:]]))|([a-z]+$))"));
+    policy next_entry = {.limits = {helper[0], helper[1]},
+                         .policy = helper[2],
+                         .password = helper[3]};
+    output.push_back(next_entry);
+  }
+  return output;
+}
+
+const std::string remove_non_matches(std::string s, std::regex e) {
+  std::string filtered = std::regex_replace(s, e, "");
+  return filtered;
+}
+
+const bool check_policy(policy password_entry) {
+  password_entry.password =
+      remove_non_matches(password_entry.password,
+                         std::regex("(^[" + password_entry.policy + "])"));
+  return std::regex_search(password_entry.password,
+                           std::regex(password_entry.policy + "{" +
+                                      password_entry.limits[0] + "," +
+                                      password_entry.limits[1] + "}"));
+}
+
+int count_valid_passwords(std::vector<policy> password_entries) {
+  int i = 0;
+  for (auto a : password_entries) {
+    if (check_policy(a)) {
+      ++i;
+    }
+  }
+  return i;
+}
 
 int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point t1 =
@@ -45,15 +70,15 @@ int main(int argc, char *argv[]) {
   std::vector<std::string> passwords_and_policies_from_file =
       file_to_string_vec("day2_input.txt");
   std::vector<policy> policy_vec;
-  for (auto a : passwords_and_policies_from_file) {
-    policy_vec.push_back(parse_password_policy(a));
-  }
-  std::cout << check_password(policy_vec[0]) << std::endl;
+  std::vector<policy> password_entries =
+      setup_policy_test(passwords_and_policies_from_file);
+  int num_valid_passwords = count_valid_passwords(password_entries);
+  std::cout << "Number of valid passwords: " << num_valid_passwords << std::endl;
 
-  std::chrono::high_resolution_clock::time_point t2 =
-      std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> time_span =
-      std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-  std::cout << "Duration: " << time_span.count() << "s" << std::endl;
-  return 0;
+std::chrono::high_resolution_clock::time_point t2 =
+    std::chrono::high_resolution_clock::now();
+std::chrono::duration<double> time_span =
+    std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+std::cout << "Duration: " << time_span.count() << "s" << std::endl;
+return 0;
 }
