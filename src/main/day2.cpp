@@ -1,37 +1,42 @@
 #include <chrono>
+#include <cstring>
 #include <iostream>
 #include <regex>
+#include <span>
+#include <typeinfo>
 #include <vector>
 
-struct policy_info {
+struct policy {
   std::vector<int> limits;
   std::string policy;
   std::string password;
 };
 
 std::vector<std::string> file_to_string_vec(std::string file_name);
-const policy_info
-&parse_password_policy(std::string passwords_and_policies_from_file) {
+const policy parse_password_policy(std::string password_and_policy_from_file) {
   /* Delimiters: "-", " ", ": " */
-  std::regex match_this("[[:digit:]]+");
-	std::smatch sm;
-	policy_info parsed;
+  std::vector<std::regex> match_this = {
+      std::regex("^[0-9]+"), std::regex("[0-9]+(?=[[:space:]])"),
+      std::regex("[a-z]{1}(?=:)"), std::regex("[a-z]+$")};
+  std::vector<std::string> helper;
+  std::smatch sm;
 
-	if (std::regex_match(passwords_and_policies_from_file, sm, match_this)) {
-		for (int i=0; i<2; ++i) {
-			std::string helper = sm[i];
-			parsed.limits.push_back(std::stoi(helper));
-		}
-		//parsed.policy = sm[2];
-		//parsed.password = sm[3];
-		return parsed;
-	}else{
-		for (auto a: sm) {
-			std::cout << "[" << a << "] " << std::endl;
-		}
-		throw std::runtime_error("Error: couldn't find any matches.");
-	}
+  for (auto exp : match_this) {
+    std::regex_search(password_and_policy_from_file, sm, exp);
+    helper.push_back(sm[0].str());
+  }
+  policy parsed = {.limits = {helper[0], helper[1]},
+                   .policy = helper[2],
+                   .password = helper[3]};
+  return parsed;
+  // throw std::runtime_error("Error: couldn't find any matches.");
 }
+
+/* Replace all non-policy chars and search the remaining string for a match */
+// bool check_password(policy entry){
+// 	auto const exp = std::regex("^" + entry.policy + "{" + entry.limits[0] +
+// "," + entry.limits[1] + "}$"); 	return std::regex_search(entry.password, exp);
+// }
 
 int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point t1 =
@@ -39,10 +44,11 @@ int main(int argc, char *argv[]) {
 
   std::vector<std::string> passwords_and_policies_from_file =
       file_to_string_vec("day2_input.txt");
-  struct policy_info parsed =  parse_password_policy(passwords_and_policies_from_file[0]);
-  std::cout << "Contents of passwords_and_policies_from_file[0]: " << parsed.limits[0]
-	  << ", " << parsed.limits[1] << ", "<< parsed.policy << ", " << parsed.password << std::endl;
-
+  std::vector<policy> policy_vec;
+  for (auto a : passwords_and_policies_from_file) {
+    policy_vec.push_back(parse_password_policy(a));
+  }
+  std::cout << check_password(policy_vec[0]) << std::endl;
 
   std::chrono::high_resolution_clock::time_point t2 =
       std::chrono::high_resolution_clock::now();
