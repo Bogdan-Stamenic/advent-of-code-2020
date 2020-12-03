@@ -61,6 +61,7 @@ public:
   int m_downhill_toboggan(){
     for (int i = 0; i < m_downhill_slope.size(); i++) {
         m_downhill_increment();
+        std::cout << "Increment " << i << " crashes : " << crash_counter << std::endl;
     }
     std::cout << "Crash count is : " << crash_counter << std::endl;
     return crash_counter;
@@ -80,9 +81,6 @@ int main(int argc, char *argv[]) {
   std::cout << std::boolalpha;
   DownhillToboggan sled(downhill_slope);
   sled.m_downhill_toboggan();
-  // std::cout << "downhill_slope[0][3]: " << downhill_slope[0][3] << std::endl;
-  // std::cout << "Crash into tree? : " << is_there_a_tree(downhill_slope[0][3])
-  //          << std::endl;
 
   std::chrono::high_resolution_clock::time_point toc =
       std::chrono::high_resolution_clock::now();
