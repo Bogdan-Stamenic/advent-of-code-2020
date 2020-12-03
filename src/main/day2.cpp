@@ -20,28 +20,30 @@ int main(int argc, char *argv[]) {
     int maxCount = std::stoi(entry.substr(dashPosition + 1, colonPosition - 2));
     std::string policy = entry.substr(colonPosition - 1, 1);
     std::string password = entry.substr(colonPosition + 1, entry.size() - colonPosition + 1);
-    std::cout << "minCount: " << minCount << std::endl;
-    std::cout << "maxCount: " << maxCount << std::endl;
-    std::cout << "policy: " << policy << std::endl;
-    std::cout << "password: " << password << std::endl;
+    //std::cout << "minCount: " << minCount << std::endl;
+    //std::cout << "maxCount: " << maxCount << std::endl;
+    //std::cout << "policy: " << policy << std::endl;
+    //std::cout << "password: " << password << std::endl;
 
     int policy_count = 0;
-    for (int i = 0; i < entry.size(); ++i) {
-      if (entry.find(policy) == std::string::npos) {
-        break;
+    while (password != "") {
+      if(password.find(policy) == std::string::npos){
+          break;
+      }else{
+          int idx = password.find(policy);
+          password = password.substr(idx + 1);
+          //std::cout << "Current password substring is: " << password << std::endl;
+          policy_count++;
+          //std::cout << "policy count: " << policy_count << std::endl;
       }
-      int idx = entry.find(policy);
-      entry = entry.substr(idx);
-      policy_count++;
-      std::cout << "policy count: " << policy_count << std::endl;
     }
 
-    if ( (policy_count > minCount) && (policy_count < maxCount) ) {
+    if ( (policy_count >= minCount) && (policy_count <= maxCount) ) {
         valid_count++;
-        std::cout << "Ok\n" << std::endl;
+        //std::cout << "Ok\n" << std::endl;
     }
   }
-  std::cout << "Valid passwords: " << valid_count << std::endl;
+  //std::cout << "Valid passwords: " << valid_count << std::endl;
 
   std::chrono::high_resolution_clock::time_point t2 =
       std::chrono::high_resolution_clock::now();
