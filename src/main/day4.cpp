@@ -64,7 +64,7 @@ public:
     for (auto c : clean_creds) {
       for (auto f : fields) {
           std::cout << (c.find(f) == c.end()) << std::endl;
-        if (c.find(f) == c.end()) {
+        if (c.find("bleck") == c.end()) {
             std::cout << "f : " << f << std::endl;
         } else {
             std::cout << "Bleck" << std::endl;
