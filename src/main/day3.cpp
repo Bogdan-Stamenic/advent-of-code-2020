@@ -73,9 +73,9 @@ int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point tic =
       std::chrono::high_resolution_clock::now();
 
-
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
-  std::vector<std::string> downhill_slope = file_to_string_vec("day3_input.txt");
+    std::vector<std::string> downhill_slope =
+        file_to_string_vec("day3_input.txt");
     DownhillToboggan sled(downhill_slope);
     sled.downhill_toboggan(3, 1);
   } else if ((argc == 2) && (*argv[1] == '2')) {
