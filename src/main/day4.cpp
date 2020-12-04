@@ -14,17 +14,28 @@ class PassportProcessor {
 
           std::map<std::string, std::string> messy_entry_to_map (std::string messy_entry){
               std::map<std::string, std::string> myMap;
-              while(!messy_entry.empty()){
+              int idx = 0;
+              while(idx < messy_entry.size()){
               /*insert code here*/
+                  if (messy_entry.find(:, idx) != std::string::npos) {
+                      std::string key = messy_entry.substr(idx, 3);
+                      std::cout << "Key : " << key << std::endl;
+                      /* should equal std::string::npos when at final entry --> */
+                      int eov = messy_entry.find(" ", idx); 
+                      std::string value = messy_entry.substr(idx+4, eov - (idx + 4));
+                      std::cout << "Value : " << value << std::endl;
+                      myMap.insert(std::pair<std::string, std::string>(key, value));
+                      idx += 5 + value.size();
+                      continue;
+                  } else {
+                      break;
+                  }
               }
-              
+              return myMap;
           }
 
           bool is_key_inside (std::string key, int idx){
-              if(clean_creds[idx].find(key) != clean_creds[idx].end()){
-                  return true;
-              }
-              return false;
+              return clean_creds[idx].find(key) != clean_creds[idx].end();
           }
 
     public:
