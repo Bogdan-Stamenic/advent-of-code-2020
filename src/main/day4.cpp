@@ -17,9 +17,8 @@ private:
     return clean_creds[idx].find(key) != clean_creds[idx].end();
   }
 
-  void
-  messy_entry_to_map(std::unordered_map<std::string, std::string> myMap,
-                     std::string messy_entry) {
+  void messy_entry_to_map(std::unordered_map<std::string, std::string> myMap,
+                          std::string messy_entry) {
     int idx = 0;
     while (idx < messy_entry.size()) {
       /*insert code here*/
@@ -50,11 +49,11 @@ public:
     for (auto messy_cred_entry : messy_creds) {
       if (messy_cred_entry.empty()) {
         clean_creds.push_back(clean_cred_entry);
-        //clean_cred_entry.erase(clean_cred_entry.begin(),
+        // clean_cred_entry.erase(clean_cred_entry.begin(),
         //                       clean_cred_entry.end());
         // std::cout << "Empty entry! Moving to next map." << std::endl;
       } else {
-            messy_entry_to_map(clean_cred_entry, messy_cred_entry);
+        messy_entry_to_map(clean_cred_entry, messy_cred_entry);
         // std::cout << "Appending to current map." << std::endl;
       }
     }
