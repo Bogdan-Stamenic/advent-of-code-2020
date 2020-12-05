@@ -1,9 +1,9 @@
 #include <chrono>
 #include <cstdio>
 #include <iostream>
-#include <map>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 std::vector<std::string> file_to_string_vec(std::string file_name,
@@ -11,14 +11,15 @@ std::vector<std::string> file_to_string_vec(std::string file_name,
 
 class PassportProcessor {
 private:
-  std::vector<std::map<std::string, std::string>> clean_creds;
+  std::vector<std::unordered_map<std::string, std::string>> clean_creds;
 
   bool is_key_inside(std::string key, int idx) {
     return clean_creds[idx].find(key) != clean_creds[idx].end();
   }
 
-  void messy_entry_to_map(std::map<std::string, std::string> myMap,
-                          std::string messy_entry) {
+  void
+  messy_entry_to_map(std::unordered_map<std::string, std::string> myMap,
+                     std::string messy_entry) {
     int idx = 0;
     while (idx < messy_entry.size()) {
       /*insert code here*/
@@ -29,7 +30,10 @@ private:
         int eov = messy_entry.find(" ", idx);
         std::string value = messy_entry.substr(idx + 4, eov - (idx + 4));
         // std::cout << "Value : " << value << std::endl;
-        myMap.insert(std::pair<std::string, std::string>(key, value));
+        myMap.emplace(key, value);
+        std::pair<std::string, std::string> entry(key, value);
+        // std::cout << "entry->first : " << entry.first << std::endl;
+        // std::cout << "entry->second : " << entry.second << std::endl;
         idx += 5 + value.size();
         continue;
       } else {
@@ -42,17 +46,16 @@ public:
   void tidy_credentials(std::vector<std::string> messy_creds) {
     /* clear map clean_creds before starting */
     clean_creds.erase(clean_creds.begin(), clean_creds.end());
-    std::map<std::string, std::string> clean_cred_entry;
+    std::unordered_map<std::string, std::string> clean_cred_entry;
     for (auto messy_cred_entry : messy_creds) {
       if (messy_cred_entry.empty()) {
         clean_creds.push_back(clean_cred_entry);
-        clean_cred_entry.erase(clean_cred_entry.begin(),
-                               clean_cred_entry.end());
-        //std::cout << "Empty entry! Moving to next map." << std::endl;
+        //clean_cred_entry.erase(clean_cred_entry.begin(),
+        //                       clean_cred_entry.end());
+        // std::cout << "Empty entry! Moving to next map." << std::endl;
       } else {
-        messy_entry_to_map(clean_cred_entry, messy_cred_entry);
-        //std::cout << "Appending to current map." << std::endl;
-
+            messy_entry_to_map(clean_cred_entry, messy_cred_entry);
+        // std::cout << "Appending to current map." << std::endl;
       }
     }
     // throw std::runtime_error("Error: something unexpected happened.");
@@ -63,19 +66,34 @@ public:
     int valid_count = 0;
     std::vector<std::string> fields = {"ecl", "pid", "eyr", "hcl",
                                        "byr", "iyr", "hgt"};
-#pragma omp for schedule(dynamic)
-    for (auto c : clean_creds) {
+    /*#pragma omp for schedule(dynamic)*/
+    std::vector<std::unordered_map<std::string, std::string>>::iterator c;
+    // for (auto c : clean_creds) {
+    for (c = clean_creds.begin(); c < clean_creds.begin() + 3; c++) {
+      std::cout << "Next!" << std::endl;
+      for (auto v : *c) {
+        std::cout << "v.first: [" << v.first << "]" << std::endl;
+      }
+      if (c->empty()) {
+        std::cout << "Map is empty!" << std::endl;
+      }
       for (auto f : fields) {
-        //std::cout << (c.count(f) == 0) << std::endl;
-        if (c.count(f) == 0) {
-          //std::cout << "f : " << f << std::endl;
+        // std::cout << (c.count(f) == 0) << std::endl;
+        // if (c.count(f) == 0) {
+        if (c->count(f) == 0) {
+          std::cout << "f : [" << f << "]" << std::endl;
         } else {
-          //std::cout << "Bleck" << std::endl;
+          std::cout << "Bleck" << std::endl;
         }
       }
       valid_count += 1;
     }
     std::cout << "Valid passports : " << valid_count << std::endl;
+  }
+  void print_clean_creds_entry_size() {
+    for (auto a : clean_creds) {
+      std::cout << "Size of clean_creds entry : " << a.size() << std::endl;
+    }
   }
 
   // void print_keys(){
@@ -97,6 +115,7 @@ int main(int argc, char *argv[]) {
       file_to_string_vec("day4_input.txt");
   PassportProcessor bob;
   bob.tidy_credentials(passport_credentials_messy);
+  // bob.print_clean_creds_entry_size();
   bob.get_num_valid_p1();
 
   std::chrono::high_resolution_clock::time_point toc =
