@@ -1,5 +1,11 @@
 DepsDay1 = file_to_vec.o find_sum_2020.o
 
+day6: day6.o file_to_vec.o
+	g++ -o day6 file_to_vec.o day6.o
+	mkdir -p bin
+	mv day6 bin/day6
+	make clean
+
 day5: day5.o file_to_vec.o
 	g++ -o day5 file_to_vec.o day5.o
 	mkdir -p bin
@@ -31,6 +37,9 @@ day1: day1.o $(DepsDay1)
 	make clean
 
 ## Object files compiled from src/main/
+day6.o: src/main/day6.cpp
+	g++ -c src/main/day6.cpp
+
 day5.o: src/main/day5.cpp
 	g++ -c -fpermissive src/main/day5.cpp
 
