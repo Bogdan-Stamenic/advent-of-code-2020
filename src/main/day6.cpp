@@ -1,3 +1,4 @@
+#include <iostream>
 #include <chrono>
 #include <string>
 #include <vector>
@@ -13,6 +14,14 @@ std::chrono::high_resolution_clock::time_point t1 =
 if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
   /* day6 - part 1 */
   std::vector<std::string> raw_input = file_to_string_vec("day6_input.txt");
+  int i = 0;
+  for (auto a: raw_input) {
+      std::cout << a << std::endl;
+      if (a == "") {
+          i++;
+          std::cout << i << ": End of Group" << std::endl;
+      }
+  }
 } else if ((argc == 2) && (*argv[1] == '2')) {
   /* day6 - part 2 */
   std::vector<std::string> raw_input = file_to_string_vec("day6_input.txt");
