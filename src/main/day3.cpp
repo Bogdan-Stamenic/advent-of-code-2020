@@ -1,9 +1,4 @@
-#include <chrono>
-#include <iostream>
-#include <stdexcept>
-#include <vector>
-
-std::vector<std::string> file_to_string_vec(std::string file_name);
+#include "../../include/day3.h"
 
 class DownhillToboggan {
 private:

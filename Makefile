@@ -1,68 +1,46 @@
-DepsDay1 = file_to_vec.o find_sum_2020.o
+srcFiles=day1 day2 day3 day4 day5
 
-day6: day6.o file_to_vec.o
-	g++ -o day6 file_to_vec.o day6.o
-	mkdir -p bin
-	mv day6 bin/day6
+all: $(srcFiles)
 	make clean
 
-day5: day5.o file_to_vec.o
-	g++ -o day5 file_to_vec.o day5.o
+%: %.o file_to_vec.o
+	g++ -o $* file_to_vec.o $*.o
 	mkdir -p bin
-	mv day5 bin/day5
-	make clean
+	mv $* bin/$*
 
-day4: day4.o file_to_vec.o
-	g++ -o day4 -fopenmp file_to_vec.o day4.o
+day4: day4.o file_to_vec.o passport_processor.o
+	g++ -o day4 file_to_vec.o passport_processor.o day4.o
 	mkdir -p bin
 	mv day4 bin/day4
-	make clean
 
-day3: day3.o file_to_vec.o
-	g++ -o day3 file_to_vec.o day3.o
-	mkdir -p bin
-	mv day3 bin/day3
-	make clean
-
-day2: day2.o file_to_vec.o
-	g++ -o day2 file_to_vec.o day2.o
-	mkdir -p bin
-	mv day2 bin/day2
-	make clean
-
-day1: day1.o $(DepsDay1)
-	g++ -o day1 $(DepsDay1) day1.o
+day1: day1.o file_to_vec.o find_sum_2020.o
+	g++ -o day1 file_to_vec.o find_sum_2020.o day1.o
 	mkdir -p bin
 	mv day1 bin/day1
-	make clean
 
-## Object files compiled from src/main/
-day6.o: src/main/day6.cpp
-	g++ -c src/main/day6.cpp
+# NEW: Object files compiled from src/main/
+%.o: src/main/%.cpp include/%.h
+	g++ -c -std=c++20 src/main/$*.cpp
 
-day5.o: src/main/day5.cpp
-	g++ -c -fpermissive src/main/day5.cpp
-
-day4.o: src/main/day4.cpp
-	g++ -c -fopenmp src/main/day4.cpp
-
-day3.o: src/main/day3.cpp
-	g++ -c src/main/day3.cpp
-
-day2.o: src/main/day2.cpp
-	g++ -c src/main/day2.cpp
-
-day1.o: src/main/day1.cpp
-	g++ -c -std=c++20 src/main/day1.cpp
+# OLD: Object files compiled from src/main/
+%.o: src/main/%.cpp
+	g++ -c -std=c++20 src/main/$*.cpp
 
 ## Object files compiled from src/
+passport_processor.o: src/passport_processor.cpp include/passport_processor.h
+	g++ -c -std=c++20 src/passport_processor.cpp
+
 file_to_vec.o: src/file_to_vec.cpp
-	g++ -c src/file_to_vec.cpp
+	g++ -c -std=c++20 src/file_to_vec.cpp
 
 find_sum_2020.o: src/find_sum_2020.cpp
 	g++ -c -std=c++20 src/find_sum_2020.cpp
 
 clean: FORCE
 	rm *.o
+
+clear: FORCE
+	rm ./bin/*
+	make clean
 
 FORCE:

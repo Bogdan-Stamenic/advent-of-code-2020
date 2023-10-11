@@ -1,19 +1,4 @@
-#include <chrono>
-#include <iostream>
-#include <regex>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-std::vector<std::string> file_to_string_vec(std::string file_name,
-                                            char delim = '\n');
-
-std::unordered_map<char, int> decoder({{'F', 0}, {'B', 1}, {'L', 0}, {'R', 1}});
-
-struct SeatPos {
-  unsigned int row;
-  unsigned int column;
-};
+#include "../../include/day5.h"
 
 int decode_row(std::string row_code) {
   /* 7-digit binary number --> start with 64 */

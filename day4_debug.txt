@@ -1,0 +1,17 @@
+ecl:#eef340 eyr:2023 hcl:#c0946f pid:244684338 iyr:2020 cid:57 byr:1969 hgt:152cm
+
+pid:303807545 cid:213 ecl:gry hcl:#fffffd
+eyr:2038 byr:1951
+hgt:171cm iyr:2011
+
+hcl:#c0946f byr:1933 eyr:2025 pid:517067213 hgt:173cm
+ecl:hzl
+iyr:2018
+
+pid:5253256652 byr:2009 hgt:152cm iyr:1989 eyr:1968 hcl:64cb63 ecl:hzl
+
+iyr:2013
+pid:862607211 eyr:2020
+hgt:174cm
+byr:1990
+ecl:blu hcl:#888785

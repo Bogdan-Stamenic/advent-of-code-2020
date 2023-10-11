@@ -1,10 +1,4 @@
-#include <iostream>
-#include <chrono>
-#include <string>
-#include <vector>
-
-std::vector<std::string> file_to_string_vec(std::string file_name,
-                                            char delim = '\n');
+#include "../../include/day6.h"
 
 int main(int argc, char *argv[]) {
 /* Start timer */

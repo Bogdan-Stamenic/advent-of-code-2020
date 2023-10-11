@@ -4,6 +4,9 @@
 #include <string>
 #include <stdexcept>
 
+//std::vector<int> file_to_int_vec(std::string file_name);
+//std::vector<std::string> file_to_string_vec(std::string file_name, char delim);
+
 std::vector<int> file_to_int_vec(std::string file_name)
 {
 	std::ifstream input_stream;

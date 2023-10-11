@@ -1,8 +1,4 @@
-#include <chrono>
-#include <cstring>
-#include <iostream>
-#include <iterator>
-#include <vector>
+#include "../../include/day2.h"
 
 void solve_part1(std::vector<std::string> passwords_and_policies_from_file) {
   int valid_count = 0;
@@ -65,8 +61,6 @@ void solve_part2(std::vector<std::string> passwords_and_policies_from_file) {
   }
   std::cout << "Valid passwords: " << valid_count << std::endl;
 }
-
-std::vector<std::string> file_to_string_vec(std::string file_name);
 
 int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point t1 =
