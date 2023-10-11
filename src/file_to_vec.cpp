@@ -29,6 +29,7 @@ std::vector<int> file_to_int_vec(std::string file_name)
 	return output_vec;
 }
 
+/* Read file line-by-line into vector. */
 std::vector<std::string> file_to_string_vec(std::string file_name, char delim = '\n')
 {
 	std::ifstream input_stream;

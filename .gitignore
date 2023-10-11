@@ -1,4 +1,5 @@
 bin/*
 output.txt
+*.o
 *.swp
 *~

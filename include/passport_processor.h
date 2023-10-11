@@ -7,17 +7,19 @@
 #include <vector>
 
 class PassportProcessor {
-private:
-  std::vector<std::unordered_map<std::string, std::string>> clean_creds;
-  bool is_key_inside(std::string key, int idx);
-  void parse_and_append_str_to_map(std::unordered_map<std::string, std::string> myMap, std::string messy_entr, bool debug=false);
-  void tidy_credentials(std::vector<std::string> messy_creds);
-
 public:
-  void get_num_valid_p1();
-  void print_clean_creds_entry_size();
-  PassportProcessor(std::vector<std::string> messy_credentials) {
-      tidy_credentials(messy_credentials);
-  }
-  ~PassportProcessor() {}
+  int get_passports_size();
+  void print_passports_contents();
+  PassportProcessor(const std::vector<std::string>& input_str);
+  ~PassportProcessor() = default;
+
+private:
+  std::unordered_map<std::string,unsigned int> m_encode_passport_cred{{"pid",0},{"ecl",1},{"hcl",2},{"eyr",3},{"byr",4},{"hgt",5},{"iyr",6},{"cid",7}};
+  std::unordered_map<unsigned int,std::string> m_decode_passport_cred{{0,"pid"},{1,"ecl"},{2,"hcl"},{3,"eyr"},{4,"byr"},{5,"hgt"},{6,"iyr"},{7,"cid"}};
+  std::vector<std::string> m_passports;
+  std::vector<std::unordered_map<unsigned int,std::string>> m_processed_passports;
+
+  std::pair<unsigned int, std::string> extract_key_value_from_passport(const std::string& passport, const unsigned int sep_idx);  void input_to_passport_vec(const std::vector<std::string>& input_str);
+  void parse_passport_credentials();
 };
+

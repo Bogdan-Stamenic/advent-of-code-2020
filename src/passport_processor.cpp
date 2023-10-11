@@ -1,83 +1,67 @@
 #include "../include/passport_processor.h"
 
-bool PassportProcessor::is_key_inside(std::string key, int idx) {
-return clean_creds[idx].find(key) != clean_creds[idx].end();
+
+PassportProcessor::PassportProcessor(const std::vector<std::string>& input_str) {
+    input_to_passport_vec(input_str);
+    parse_passport_credentials();
 }
 
-
-/* Parse string into unordered map. */
-void PassportProcessor::parse_and_append_str_to_map(std::unordered_map<std::string, std::string> myMap, std::string messy_entry, bool debug) {
-  int idx = 3;/* Colons must always be at idx >= 3 */
-  while (idx < messy_entry.size()) {
-    if (messy_entry.find(":", idx) != std::string::npos) {/*Is there a match at idx?*/
-      /*Key always starts 3 before colon ":"*/
-      std::string key = messy_entry.substr(idx-3, 3);
-      /* If no " " is found, then the entry is final and the value goes until the end of messy_entry */
-      int val_final_idx = (messy_entry.find(" ", idx) == std::string::npos) ? messy_entry.size() - 1 : messy_entry.find(" ", idx) - 1;
-      std::string value = messy_entry.substr(idx + 1, val_final_idx - idx);
-      // std::cout << "Value : " << value << std::endl;
-      myMap.emplace(key, value);
-      std::pair<std::string, std::string> entry(key, value);
-      std::cout << "entry->first : " << entry.first << std::endl;
-      std::cout << "entry->second : " << entry.second << std::endl;
-      idx += 5 + value.size();
-      continue;
-    } else {
-      break;
-    }
-  }
+int PassportProcessor::get_passports_size() {
+    return m_passports.size();
 }
 
-void PassportProcessor::tidy_credentials(std::vector<std::string> messy_creds) {
-  /* clear vector clean_creds before starting */
-  this->clean_creds.erase(clean_creds.begin(), clean_creds.end());
-  std::unordered_map<std::string, std::string> clean_cred_entry;
-  for (auto m : messy_creds) {
-    std::cout << m << std::endl;
-    if (m.empty()) {
-      /* Empty line means end of passport entry -> pushback */
-      clean_creds.push_back(clean_cred_entry);
-    } else {
-      parse_and_append_str_to_map(clean_cred_entry, m);
+void PassportProcessor::print_passports_contents() {
+    for(const auto a: m_passports) {
+        std::cout << a << std::endl;
     }
-  }
-  // throw std::runtime_error("Error: something unexpected happened.");
-  std::cout << "Credentials have been processed!" << std::endl;
 }
 
-void PassportProcessor::get_num_valid_p1() {
-  int valid_count = 0;
-  std::vector<std::string> fields = {"ecl", "pid", "eyr", "hcl",
-                                     "byr", "iyr", "hgt"};
-  /*#pragma omp for schedule(dynamic)*/
-  std::vector<std::unordered_map<std::string, std::string>>::iterator c;
-  // for (auto c : clean_creds) {
-  for (c = clean_creds.begin(); c < clean_creds.begin() + 3; c++) {
-    std::cout << "Next!" << std::endl;
-    for (auto v : *c) {
-      std::cout << "v.first: [" << v.first << "]" << std::endl;
+/* Gets vector of passport input file that was read line-by-lines (delim=\n).
+ * Passport entries that spanned multiple lines are grouped into their own single vector entry in passport.
+ * */
+void PassportProcessor::input_to_passport_vec(const std::vector<std::string>& input_str) {
+    bool parsing_passport = false;
+    for(const auto& line: input_str) {
+        if(line.find(':') != std::string::npos) {
+            if(parsing_passport){
+                m_passports.back().append(std::string(" ").append(line));
+            } else {
+                m_passports.push_back(line);
+                parsing_passport = true;
+            }
+        } else {
+            parsing_passport = false;
+        }
     }
-    if (c->empty()) {
-      std::cout << "Map is empty!" << std::endl;
-    }
-    for (auto f : fields) {
-      // std::cout << (c.count(f) == 0) << std::endl;
-      // if (c.count(f) == 0) {
-      if (c->count(f) == 0) {
-        std::cout << "f : [" << f << "]" << std::endl;
-      } else {
-        std::cout << "Bleck" << std::endl;
-      }
-    }
-    valid_count += 1;
-  }
-  std::cout << "Valid passports : " << valid_count << std::endl;
 }
 
-void PassportProcessor::print_clean_creds_entry_size() {
-  for (auto a : clean_creds) {
-    std::cout << "Size of clean_creds entry : " << a.size() << std::endl;
-  }
+/* Gets key and value and returns them as a pair */
+std::pair<unsigned int, std::string> PassportProcessor::extract_key_value_from_passport(const std::string& passport, const unsigned int sep_idx) {
+            /* Find where the key starts and value ends of key-value pair embedded in passport */
+            unsigned int key_idx = (passport.rfind(' ', sep_idx) == std::string::npos) ? 0 : passport.rfind(' ', sep_idx);
+            unsigned int val_idx = (passport.find(' ', sep_idx) == std::string::npos) ? passport.length() : passport.find(' ', sep_idx);
+            /* Extract key and value from string*/
+            std::string key = passport.substr(sep_idx-3,3);
+            unsigned int encoded_key = m_encode_passport_cred.at(key);
+            unsigned int val_length = val_idx - (sep_idx + 1);
+            std::string value = passport.substr(sep_idx+1, val_length);
+            /* Construct pair and return it */
+            std::pair<unsigned int, std::string> passport_entry{encoded_key, value};
+            return passport_entry;
 }
 
-
+/* Read credentials for each passport into a hash map and save it to m_processed_passports */
+void PassportProcessor::parse_passport_credentials() {
+    for (const auto passport: m_passports) {
+        unsigned int sep_idx = 0;
+        std::unordered_map<unsigned int, std::string> processed_passport;
+        while(passport.find(':', sep_idx) != std::string::npos) {
+            sep_idx = passport.find(':', sep_idx);
+            std::pair<unsigned int, std::string> passport_entry = extract_key_value_from_passport(passport, sep_idx);
+            std::cout << "passport_entry.first : " << passport_entry.first << "; passport_entry.second : " << passport_entry.second << std::endl;
+            processed_passport.insert(passport_entry);
+            sep_idx += 2;
+        }
+        m_processed_passports.push_back(processed_passport);
+    }
+}
