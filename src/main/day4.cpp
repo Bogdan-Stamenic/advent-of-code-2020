@@ -6,17 +6,21 @@ int main(int argc, char *argv[]) {
 
   /* Solution to 2020 Day 4 problem */
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {/*solve part 1*/
-    std::cout << "Not yet implemented..."
-              << std::endl;
+      std::vector<std::string> passport_credentials_messy =
+          file_to_string_vec("input/day4_input.txt");
+      PassportProcessor bob(passport_credentials_messy);
+      const unsigned int answer = bob.count_valid_passports();
+      std::cout << "Valid number of passports for day4-p1 is : " << answer << std::endl;
   } else if ((argc == 2) && (*argv[1] == '2')) {/*solve part 2*/
     std::cout << "Not yet implemented..."
               << std::endl;
   } else if ((argc == 2) && (*argv[1] == '3')) {/*no part 3 -> developement*/
-      /*Small test file; 4 valid "passports" and 1 invalid; Only 2 are valid passports with "cid"*/
+      /*Small test file; 4 valid "passports"; Only 2 are valid passports with "cid"*/
       std::vector<std::string> passport_credentials_messy =
           file_to_string_vec("input/day4_debug.txt");
       PassportProcessor bob(passport_credentials_messy);
-      bob.print_passports_contents();
+      const unsigned int answer = bob.count_valid_passports();
+      std::cout << "Valid number of passports is : " << answer << std::endl;
   } else {
     std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" for debugging."
               << std::endl;

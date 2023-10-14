@@ -2,11 +2,11 @@
 
 
 PassportProcessor::PassportProcessor(const std::vector<std::string>& input_str) {
-    input_to_passport_vec(input_str);
-    parse_passport_credentials();
+    input_to_passport_vec(input_str);//writes to m_passports
+    parse_passport_credentials();//writes to m_processed_passports
 }
 
-int PassportProcessor::get_passports_size() {
+const unsigned int PassportProcessor::get_passports_size() {
     return m_passports.size();
 }
 
@@ -14,6 +14,25 @@ void PassportProcessor::print_passports_contents() {
     for(const auto a: m_passports) {
         std::cout << a << std::endl;
     }
+}
+
+unsigned int PassportProcessor::count_valid_passports() {
+    /* For correspondance, refer to PassportProcessor::m_decode_passport_cred */
+    const std::vector<unsigned int> check_creds = {0,1,2,3,4,5,6};
+    unsigned int valid_passport_count = 0;
+    bool invalid_pass = false;
+    for(const auto& passport: m_processed_passports) {
+        for (auto a: check_creds) {
+            if(passport.count(a) == 0) {
+                /* Flag as invalid for missing a credential */
+                invalid_pass = true;
+                break;
+            }
+        }
+        valid_passport_count += (invalid_pass) ? 0 : 1;
+        invalid_pass = false;
+    }
+    return valid_passport_count;
 }
 
 /* Gets vector of passport input file that was read line-by-lines (delim=\n).
@@ -58,9 +77,9 @@ void PassportProcessor::parse_passport_credentials() {
         while(passport.find(':', sep_idx) != std::string::npos) {
             sep_idx = passport.find(':', sep_idx);
             std::pair<unsigned int, std::string> passport_entry = extract_key_value_from_passport(passport, sep_idx);
-            std::cout << "passport_entry.first : " << passport_entry.first << "; passport_entry.second : " << passport_entry.second << std::endl;
+            //std::cout << "passport_entry.first : " << passport_entry.first << "; passport_entry.second : " << passport_entry.second << std::endl;
             processed_passport.insert(passport_entry);
-            sep_idx += 2;
+            sep_idx += 1;
         }
         m_processed_passports.push_back(processed_passport);
     }

@@ -4,7 +4,7 @@ pid:303807545 cid:213 ecl:gry hcl:#fffffd
 eyr:2038 byr:1951
 hgt:171cm iyr:2011
 
-hcl:#c0946f byr:1933 eyr:2025 pid:517067213 hgt:173cm
+byr:1933 eyr:2025 pid:517067213 hgt:173cm
 ecl:hzl
 iyr:2018
 

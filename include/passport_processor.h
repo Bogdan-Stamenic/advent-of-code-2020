@@ -8,8 +8,9 @@
 
 class PassportProcessor {
 public:
-  int get_passports_size();
+  const unsigned int get_passports_size();
   void print_passports_contents();
+  unsigned int count_valid_passports();
   PassportProcessor(const std::vector<std::string>& input_str);
   ~PassportProcessor() = default;
 
