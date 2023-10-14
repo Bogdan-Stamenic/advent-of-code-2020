@@ -16,21 +16,23 @@ void PassportProcessor::print_passports_contents() {
     }
 }
 
-unsigned int PassportProcessor::count_valid_passports() {
-    /* For correspondance, refer to PassportProcessor::m_decode_passport_cred */
-    const std::vector<unsigned int> check_creds = {0,1,2,3,4,5,6};
+/* Counts valid passports according to AOC 2020 day4-part 1. */
+unsigned int PassportProcessor::count_passports_with_all_req_fields() {
     unsigned int valid_passport_count = 0;
-    bool invalid_pass = false;
     for(const auto& passport: m_processed_passports) {
-        for (auto a: check_creds) {
-            if(passport.count(a) == 0) {
-                /* Flag as invalid for missing a credential */
-                invalid_pass = true;
-                break;
-            }
+        const bool has_all_req_fields = does_processed_passport_have_all_req_fields(passport);
+        valid_passport_count += (has_all_req_fields) ? 1 : 0;
+    }
+    return valid_passport_count;
+}
+
+unsigned int PassportProcessor::count_valid_passports() {
+    std::vector<std::unordered_map<unsigned int,std::string>> candidate_passports = collect_candidate_valid_passports();
+    unsigned int valid_passport_count = 0;
+    for(const auto& passport: candidate_passports) {
+        if(validate_passport(passport)){
+            valid_passport_count += 1;
         }
-        valid_passport_count += (invalid_pass) ? 0 : 1;
-        invalid_pass = false;
     }
     return valid_passport_count;
 }
@@ -77,10 +79,40 @@ void PassportProcessor::parse_passport_credentials() {
         while(passport.find(':', sep_idx) != std::string::npos) {
             sep_idx = passport.find(':', sep_idx);
             std::pair<unsigned int, std::string> passport_entry = extract_key_value_from_passport(passport, sep_idx);
-            //std::cout << "passport_entry.first : " << passport_entry.first << "; passport_entry.second : " << passport_entry.second << std::endl;
             processed_passport.insert(passport_entry);
             sep_idx += 1;
         }
         m_processed_passports.push_back(processed_passport);
     }
+}
+
+/* Checks for different passport credentials depending on the initializer list that's passed. */
+const bool PassportProcessor::does_processed_passport_have_all_req_fields(const std::unordered_map<unsigned int, std::string>& passport, std::initializer_list<unsigned int> required_creds){
+    /* For correspondance, refer to PassportProcessor::m_decode_passport_cred */
+    bool has_all_req_fields = true;
+    const std::vector<unsigned int> check_creds = required_creds;
+    for (auto a: check_creds) {
+        if(passport.count(a) == 0) {
+            /* Flag as invalid for missing a credential */
+            has_all_req_fields = false;
+            break;
+        }
+    }
+    return has_all_req_fields;
+}
+
+std::vector<std::unordered_map<unsigned int,std::string>> PassportProcessor::collect_candidate_valid_passports() {
+    std::vector<std::unordered_map<unsigned int,std::string>> candidate_passports;
+    for(const auto passport: m_processed_passports) {
+        const bool is_candidate = does_processed_passport_have_all_req_fields(passport);
+        if(is_candidate){
+            candidate_passports.push_back(passport);
+        }
+    }
+    return candidate_passports;
+}
+
+const bool PassportProcessor::validate_passport(const std::unordered_map<unsigned int,std::string>& candidate_passport) {
+    /* TODO: write config class for validation and pass it here */
+    return true;
 }
