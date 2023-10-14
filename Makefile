@@ -1,23 +1,29 @@
-srcFiles=day1 day2 day3 day4 day5
+runtimeBin=day1 day2 day3 day4 day5
+debugBin=day1_debug day2_debug day3_debug day4_debug day5_debug
 
-all: $(srcFiles)
-	make clean
+all: $(runtimeBin)
+
+debug: $(debugBin)
 
 %: %.o file_to_vec.o
 	g++ -o $* file_to_vec.o $*.o
-	mkdir -p bin
-	mv $* bin/$*
 
 day4: day4.o file_to_vec.o passport_processor.o
 	g++ -o day4 file_to_vec.o passport_processor.o day4.o
-	mkdir -p bin
-	mv day4 bin/day4
 
 day1: day1.o file_to_vec.o find_sum_2020.o
 	g++ -o day1 file_to_vec.o find_sum_2020.o day1.o
-	mkdir -p bin
-	mv day1 bin/day1
 
+%_debug: %.o file_to_vec.o
+	g++ -o $*_debug file_to_vec.o $*.o
+
+day4_debug: day4.o file_to_vec.o passport_processor.o
+	g++ -o day4_debug file_to_vec.o passport_processor.o day4.o
+
+day1_debug: day1.o file_to_vec.o find_sum_2020.o
+	g++ -o day1_debug file_to_vec.o find_sum_2020.o day1.o
+
+day1: day1.o file_to_vec.o find_sum_2020.o
 # NEW: Object files compiled from src/main/
 %.o: src/main/%.cpp include/%.h
 	g++ -c -std=c++20 src/main/$*.cpp
@@ -40,7 +46,7 @@ clean: FORCE
 	rm *.o
 
 clear: FORCE
-	rm ./bin/*
 	make clean
+	rm day*
 
 FORCE:

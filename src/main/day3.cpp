@@ -70,12 +70,12 @@ int main(int argc, char *argv[]) {
 
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
     std::vector<std::string> downhill_slope =
-        file_to_string_vec("day3_input.txt");
+        file_to_string_vec("input/day3_input.txt");
     DownhillToboggan sled(downhill_slope);
     sled.downhill_toboggan(3, 1);
   } else if ((argc == 2) && (*argv[1] == '2')) {
     std::vector<std::string> downhill_slope =
-        file_to_string_vec("day3_input.txt");
+        file_to_string_vec("input/day3_input.txt");
     std::cout << std::boolalpha;
     DownhillToboggan sled(downhill_slope);
     sled.print_downhill_slope();

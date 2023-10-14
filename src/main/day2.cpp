@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
       std::chrono::high_resolution_clock::now();
 
   std::vector<std::string> passwords_and_policies_from_file =
-      file_to_string_vec("day2_input.txt");
+      file_to_string_vec("input/day2_input.txt");
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
     solve_part1(passwords_and_policies_from_file);
   } else if ((argc == 2) && (*argv[1] == '2')) {

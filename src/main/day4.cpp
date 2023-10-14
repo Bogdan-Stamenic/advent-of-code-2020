@@ -11,10 +11,10 @@ int main(int argc, char *argv[]) {
   } else if ((argc == 2) && (*argv[1] == '2')) {/*solve part 2*/
     std::cout << "Not yet implemented..."
               << std::endl;
-  } else if ((argc == 2) && (*argv[1] == '3')) {/*no part 3 -> debug*/
+  } else if ((argc == 2) && (*argv[1] == '3')) {/*no part 3 -> developement*/
       /*Small test file; 4 valid "passports" and 1 invalid; Only 2 are valid passports with "cid"*/
       std::vector<std::string> passport_credentials_messy =
-          file_to_string_vec("day4_debug.txt");
+          file_to_string_vec("input/day4_debug.txt");
       PassportProcessor bob(passport_credentials_messy);
       bob.print_passports_contents();
   } else {

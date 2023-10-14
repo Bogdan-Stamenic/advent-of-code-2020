@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point t1 =
       std::chrono::high_resolution_clock::now();
 
-  std::vector<std::string> seat_codes = file_to_string_vec("day5_input.txt");
+  std::vector<std::string> seat_codes = file_to_string_vec("input/day5_input.txt");
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
     /* day5 - part 1 */
     std::vector<SeatPos> parsed = parse_seat_codesp1(seat_codes);

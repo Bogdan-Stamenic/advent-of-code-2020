@@ -12,7 +12,7 @@ int find_sum_2020p2(std::span<int> int_vec);
 
 std::vector<int> read_expense_report()
 {
-	return file_to_int_vec("day1_input.txt");
+	return file_to_int_vec("input/day1_input.txt");
 }
 
 int main(int argc, char *argv[]){
