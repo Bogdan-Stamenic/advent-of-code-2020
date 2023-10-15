@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   } else if ((argc == 2) && (*argv[1] == '3')) {/*no part 3 -> developement*/
       /*Small test file; 4 passports have all required fields; Only 2 count when considering "cid" */
       std::vector<std::string> passport_credentials_messy =
-          file_to_string_vec("input/day4_debug.txt");
+          file_to_string_vec("input/day4_dev.txt");
       PassportProcessor bob(passport_credentials_messy);
       const unsigned int answer_p1 = bob.count_passports_with_all_req_fields();
       std::cout << "Number of passports with all required fields is : " << answer_p1 << std::endl;

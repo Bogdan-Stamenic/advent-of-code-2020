@@ -8,6 +8,9 @@ debug: $(debugBin)
 %: %.o file_to_vec.o
 	g++ -o $* file_to_vec.o $*.o
 
+day6: day6.o file_to_vec.o customs_declaration.o
+	g++ -o day6 file_to_vec.o customs_declaration.o day6.o
+
 day4: day4.o file_to_vec.o passport_processor.o
 	g++ -o day4 file_to_vec.o passport_processor.o day4.o
 
@@ -32,11 +35,10 @@ day1: day1.o file_to_vec.o find_sum_2020.o
 	g++ -c -std=c++20 src/main/$*.cpp
 
 ## Object files compiled from src/
-#passports=src/passport_processor.cpp include/passport_processor.h src/passport_validator.cpp include/passport_validator.h
-#passport_.o: $(passports)
-#	g++ -c -std=c++20 src/passport_$*.cpp
-passport_processor.o: src/passport_processor.cpp include/passport_processor.h
-	g++ -c -std=c++20 src/passport_processor.cpp
+#passport_processor.o: src/passport_processor.cpp include/passport_processor.h
+#	g++ -c -std=c++20 src/passport_processor.cpp
+%.o: src/%.cpp include/%.h
+	g++ -c -std=c++20 src/$*.cpp
 
 file_to_vec.o: src/file_to_vec.cpp
 	g++ -c -std=c++20 src/file_to_vec.cpp

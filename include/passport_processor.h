@@ -21,7 +21,8 @@ private:
   std::vector<std::string> m_passports;
   std::vector<std::unordered_map<unsigned int,std::string>> m_processed_passports;
 
-  std::pair<unsigned int, std::string> extract_key_value_from_passport(const std::string& passport, const unsigned int sep_idx);  void input_to_passport_vec(const std::vector<std::string>& input_str);
+  std::pair<unsigned int, std::string> extract_key_value_from_passport(const std::string& passport, const unsigned int sep_idx);
+  void input_to_passport_vec(const std::vector<std::string>& input_str);
   void parse_passport_credentials();
   const bool does_processed_passport_have_all_req_fields(const std::unordered_map<unsigned int, std::string>& passport, std::initializer_list<unsigned int> required_creds={0,1,2,3,4,5,6});
   std::vector<std::unordered_map<unsigned int,std::string>> collect_candidate_valid_passports();
