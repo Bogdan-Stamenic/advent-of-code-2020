@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <functional>
+#include <regex>
 #include "../include/passport_processor.h"
 
 
@@ -28,13 +31,54 @@ unsigned int PassportProcessor::count_passports_with_all_req_fields() {
 
 unsigned int PassportProcessor::count_valid_passports() {
     std::vector<std::unordered_map<unsigned int,std::string>> candidate_passports = collect_candidate_valid_passports();
-    unsigned int valid_passport_count = 0;
-    for(const auto& passport: candidate_passports) {
-        if(validate_passport(passport)){
-            valid_passport_count += 1;
+    auto test_byr = [](auto x){
+        std::string y = x.at(0);
+        return (y.length() == 4) && (std::stoi(y) >= 1920) && (std::stoi(y) <= 2002);
+    };
+    auto test_iyr = [](auto x){
+        std::string y=x.at(1);
+        return (y.length() == 4) && (std::stoi(y) >= 2010) && (std::stoi(y) <= 2020);
+    };
+    auto test_eyr = [](auto x){
+        std::string y=x.at(2);
+        return (y.length() == 4) && (std::stoi(y) >= 2020) && (std::stoi(y) <= 2030);
+    };
+    auto test_hgt = [](auto x){
+        std::string y=x.at(3);
+        if(y.find("cm") != std::string::npos){
+            return (std::stoi(y) >= 150) && (std::stoi(y) <= 193);
+        }else if(y.find("in") != std::string::npos){
+            return (std::stoi(y) >= 59) && (std::stoi(y) <= 76);
         }
-    }
-    return valid_passport_count;
+        return false;
+    };
+    auto test_hcl = [](auto x){
+        std::string y=x.at(4);
+        std::regex e("#[0-9a-f]{6}");
+        return std::regex_search(y,e);
+    };
+    auto test_ecl = [](auto x){
+        std::string y=x.at(5);
+        const std::vector<std::string> valid_colors{"amb","blu","brn","gry","grn","hzl","oth"};
+        bool is_valid_color = false;
+        for (const std::string& str: valid_colors){
+            if(y.compare(str) == 0){
+                is_valid_color = true;
+                break;
+            }
+        }
+        return is_valid_color;
+    };
+    auto test_pid = [](auto x){return (x.at(6).length() == 9);};
+    /* I couldn't figure out how to group and loop over lambdas, so just call once for each lambda instead */
+    std::erase_if(candidate_passports, std::not_fn(test_byr));
+    std::erase_if(candidate_passports, std::not_fn(test_iyr));
+    std::erase_if(candidate_passports, std::not_fn(test_eyr));
+    std::erase_if(candidate_passports, std::not_fn(test_hgt));
+    std::erase_if(candidate_passports, std::not_fn(test_hcl));
+    std::erase_if(candidate_passports, std::not_fn(test_ecl));
+    std::erase_if(candidate_passports, std::not_fn(test_pid));
+    return candidate_passports.size();
 }
 
 /* Gets vector of passport input file that was read line-by-lines (delim=\n).
@@ -112,7 +156,3 @@ std::vector<std::unordered_map<unsigned int,std::string>> PassportProcessor::col
     return candidate_passports;
 }
 
-const bool PassportProcessor::validate_passport(const std::unordered_map<unsigned int,std::string>& candidate_passport) {
-    /* TODO: write config class for validation and pass it here */
-    return true;
-}

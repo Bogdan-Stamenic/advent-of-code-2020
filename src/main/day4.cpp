@@ -12,8 +12,11 @@ int main(int argc, char *argv[]) {
       const unsigned int answer = bob.count_passports_with_all_req_fields();
       std::cout << "Valid number of passports for day4-p1 is : " << answer << std::endl;
   } else if ((argc == 2) && (*argv[1] == '2')) {/*solve part 2*/
-    std::cout << "Not yet implemented..."
-              << std::endl;
+      std::vector<std::string> passport_credentials_messy =
+          file_to_string_vec("input/day4_input.txt");
+      PassportProcessor bob(passport_credentials_messy);
+      const unsigned int answer_p2 = bob.count_valid_passports();
+      std::cout << "Number of valid passports is : " << answer_p2 << std::endl;
   } else if ((argc == 2) && (*argv[1] == '3')) {/*no part 3 -> developement*/
       /*Small test file; 4 passports have all required fields; Only 2 count when considering "cid" */
       std::vector<std::string> passport_credentials_messy =

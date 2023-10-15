@@ -24,8 +24,7 @@ day1_debug: day1.o file_to_vec.o find_sum_2020.o
 	g++ -o day1_debug file_to_vec.o find_sum_2020.o day1.o
 
 day1: day1.o file_to_vec.o find_sum_2020.o
-# NEW: Object files compiled from src/main/
-%.o: src/main/%.cpp include/%.h
+# NEW: Object files compiled from src/main/ %.o: src/main/%.cpp include/%.h
 	g++ -c -std=c++20 src/main/$*.cpp
 
 # OLD: Object files compiled from src/main/
@@ -33,6 +32,9 @@ day1: day1.o file_to_vec.o find_sum_2020.o
 	g++ -c -std=c++20 src/main/$*.cpp
 
 ## Object files compiled from src/
+#passports=src/passport_processor.cpp include/passport_processor.h src/passport_validator.cpp include/passport_validator.h
+#passport_.o: $(passports)
+#	g++ -c -std=c++20 src/passport_$*.cpp
 passport_processor.o: src/passport_processor.cpp include/passport_processor.h
 	g++ -c -std=c++20 src/passport_processor.cpp
 
