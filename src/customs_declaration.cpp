@@ -77,7 +77,8 @@ unsigned int CustomsDeclaration::count_entire_group_said_yes(const std::string& 
         unsigned int last_idx = 0;
         bool parsing_forms = true;
         std::vector<std::string> individual_customs_forms;
-        /* Parse customs forms from a group into customs form by each individual */
+        /* Parse customs forms from a group into customs form by each individual 
+         * They all look something like this: "ab ac exy" */
         while(parsing_forms) {
             idx = (groups_customs_forms.find(' ',idx) == std::string::npos)
                 ? groups_customs_forms.size()
