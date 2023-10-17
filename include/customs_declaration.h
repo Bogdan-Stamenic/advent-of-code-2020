@@ -11,6 +11,7 @@ class CustomsDeclaration {
         ~CustomsDeclaration() = default;
         void print_all_customs_forms_by_group();
         unsigned int count_at_least_one_person_said_yes();
+        unsigned int count_everyone_said_yes();
 
     private:
         const std::vector<char> m_possible_answers = {'a','b','c','d','e',
@@ -18,5 +19,6 @@ class CustomsDeclaration {
             'v','w','x','y','z'};
         std::vector<std::string> m_customs_forms_by_group;
         void input_customs_forms(const std::vector<std::string>& input_str);
+        unsigned int count_entire_group_said_yes(const std::string& groups_customs_forms);
 };
 #endif
