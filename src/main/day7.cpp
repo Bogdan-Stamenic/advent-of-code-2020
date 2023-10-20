@@ -1,5 +1,6 @@
 #include "../../include/day7.h"
 #include <iostream>
+#include <regex>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -24,8 +25,11 @@ class RulesParser {
         }
 
     private:
-        std::unordered_map<std::string,std::unordered_map<std::string, int>> m_bag_graph;
-        /* Possible modifiers and colors found using bash cmds */
+		/* Graph representing input, e.g. light red bags contain 1 bright white bag, 2 muted yellow bags. */
+        std::unordered_map<std::string,std::unordered_map<std::string, int>> m_parent_to_child_graph;
+		/* Inverse of the above graph, i.e. 2 muted yellow bags can be contained in light red bags*/
+        std::unordered_map<std::string,std::unordered_map<std::string, int>> m_child_to_parent_graph;
+        /* Possible modifiers and colors found using bash cmds on input */
         const std::vector<std::string> m_possible_modifiers{"bright","clear","dark","dim","dotted","drab",
             "dull","faded","light","mirrored","muted","pale","plaid","posh","shiny","striped",
             "vibrant","wavy"};
@@ -35,7 +39,7 @@ class RulesParser {
             "teal","tomato","turquoise","violet","white","yellow"};
         void parse_input_to_bag_graph(const std::vector<std::string>& input){
             std::vector<std::pair<std::string,std::string>> parents_and_children_from_input;
-            /* Split parents and children from input and build graph */
+            /* Split parents and children from input and build graph; parent bags contain children bags */
             for (auto line: input) {
                 std::string sep_phrase = " bags contain ";
                 unsigned int idx = line.find(sep_phrase);
@@ -46,16 +50,67 @@ class RulesParser {
                 unsigned int parent_length = idx;
                 unsigned int children_start_idx = idx + sep_phrase.size();
                 unsigned int children_length = line.size() - (sep_phrase.size() + idx);
-                std::string parent_str = line.substr(parent_start_idx, parent_length);
+                std::string parent_bag = line.substr(parent_start_idx, parent_length);
                 std::string children_str = line.substr(children_start_idx, children_length);
-                std::pair<std::string,std::string> parent_and_children{parent_str, children_str};
-                parents_and_children_from_input.push_back(parent_and_children);
+                std::vector<std::pair<std::string,int>> children_bags = parse_contained_bags(children_str);
+				parsed_bags_to_both_graphs(parent_bag,children_bags);
             }
-            //for (auto pair: parents_and_children_from_input) {
-            //    std::cout << pair.first << std::endl;
-            //}
+			//std::cout << "parent -> child size : " << m_parent_to_child_graph.size() << std::endl;
+			//std::cout << "child -> parent size : " << m_child_to_parent_graph.size() << std::endl;
             /* For perfect hash tables (and speed) use first 2 letters of key-string (first two letters of modifier) and last 3 letters of key-string (last three letters of color) */
         }
+
+		std::vector<std::pair<std::string,int>> parse_contained_bags(const std::string& children_str) {
+			/* Starts off like this:
+			 * 5 faded blue bags, 6 dotted black bags.
+			 * */
+			std::string str = children_str;
+			std::regex e("([0-9] [a-z]+ [a-z]+)", std::regex::egrep);
+			std::smatch sm;
+			std::vector<std::string> matches;
+			while(std::regex_search(str,sm,e)){
+				matches.push_back(sm.str());
+				str = sm.suffix().str();
+			}
+			if ( (matches.empty() == true) && (children_str.find("no") == std::string::npos) ) {
+				throw std::runtime_error("something went wrong while parsing.");
+			} else if (children_str.find("no") == 0) {
+				/* If children_str was "no other bags." */
+				std::vector<std::pair<std::string,int>> v = {};
+				return v;
+			}
+			/* Now like this:
+			 * matches = {"5 faded blue", "6 dotted black"}
+			 * */
+			std::vector<std::pair<std::string,int>> v;
+			for (auto m: matches) {
+				int num = std::stoi(m.substr(0,1)); 
+				std::string bag_type = m.substr(2, std::string::npos - 2);
+				std::pair<std::string,int> contained_bags = {bag_type, num};
+				v.push_back(contained_bags);
+			}
+			/* Finally this:
+			 * v = { {"faded blue",2},{"dotted black",6} }
+			 * */
+			return v;
+		}
+
+		void parsed_bags_to_both_graphs(const std::string& parent_bag, const std::vector<std::pair<std::string,int>>& children_bags) {
+			/* parent -> child */
+			std::unordered_map<std::string,int> parent_contains_this_bag_x_times;
+			for (auto contain_pair: children_bags) {
+				parent_contains_this_bag_x_times.insert(contain_pair);
+			}
+			m_parent_to_child_graph.emplace(parent_bag,parent_contains_this_bag_x_times);
+			/* child -> parent */
+			std::unordered_map<std::string,int> child_is_inside_parent_x_times;
+			for (auto contain_pair: children_bags) {
+				child_is_inside_parent_x_times.emplace(parent_bag,contain_pair.second);
+			}
+			for (auto contain_pair: children_bags) {
+				m_child_to_parent_graph.emplace(contain_pair.first,child_is_inside_parent_x_times);
+			}
+		}
 };
 
 
@@ -66,8 +121,8 @@ std::chrono::high_resolution_clock::time_point t1 =
 
 if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
   /* day7 - part 1 */
-  //std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
-  std::cout << "Not yet implemented..." << std::endl;
+  std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
+  RulesParser stickler(input_line_by_line);
   } else if ((argc == 2) && (*argv[1] == '2')) {
   /* day7 - part 2 */
   //std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
@@ -76,7 +131,6 @@ if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
     /* developement */
   std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_dev.txt");
   RulesParser stickler(input_line_by_line);
-  stickler.print_hashing_for_testing();
 } else {
   std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" for developement." << std::endl;
   return 1;
