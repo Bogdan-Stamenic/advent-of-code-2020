@@ -1,9 +1,11 @@
 #include "../../include/day7.h"
 #include <iostream>
+#include <list>
 #include <regex>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 class RulesParser {
@@ -23,6 +25,49 @@ class RulesParser {
                 }
             }
         }
+		void print_child_to_parent_for_testing(){
+			for (auto map: m_child_to_parent_graph) {
+				std::cout <<  map.first << " in ";
+				for (auto prt: map.second) {
+					std::cout << prt.first << ", ";
+				}
+				std::cout << std::endl;
+			}
+			std::cout << std::endl;
+		}
+		void print_parent_to_child_for_testing(){
+			for (auto map: m_parent_to_child_graph) {
+				std::cout <<  map.first << " contains ";
+				for (auto prt: map.second) {
+					std::cout << prt.first << ", ";
+				}
+				std::cout << std::endl;
+			}
+			std::cout << std::endl;
+		}
+		/* depth-first search from children to parents; solves day7 part 1 */
+		void dfs_child_to_parent_graph(const std::string& bag_type_for_root_node, bool recursive_dfs=false){
+			std::unordered_set<std::string> has_been_explored;
+			if (recursive_dfs) {
+				depth_first_search_recursive(has_been_explored, bag_type_for_root_node);
+			} else {
+				depth_first_search_iterative(has_been_explored, bag_type_for_root_node);
+			}
+			std::cout << "Number of bags that contain at least one " << bag_type_for_root_node << " bag is " << (has_been_explored.size() - 1) << "." << std::endl;
+		}
+		void dfs_parent_to_child_graph(const std::string& bag_type_for_root_node, bool recursive_dfs=false){
+			std::unordered_set<std::string> has_been_explored;
+			if (recursive_dfs) {
+				depth_first_search_recursive(has_been_explored, bag_type_for_root_node, true);
+			} else {
+				depth_first_search_iterative(has_been_explored, bag_type_for_root_node, true);
+			}
+			std::cout << bag_type_for_root_node << " bag contains " << (has_been_explored.size() - 1) << " other bag types." << std::endl;
+		}
+		void count_bags_contained_in(const std::string& bag_type_for_root_node){
+			unsigned int num_bags = recursive_bag_count(bag_type_for_root_node, true);
+			std::cout << bag_type_for_root_node << " bag contains a total of " << num_bags << " inside." << std::endl;
+		}
 
     private:
 		/* Graph representing input, e.g. light red bags contain 1 bright white bag, 2 muted yellow bags. */
@@ -37,6 +82,7 @@ class RulesParser {
             "chartreuse","coral","crimson","cyan","fuchsia","gold","gray","green","indigo","lavender",
             "lime","magenta","maroon","olive","orange","plum","purple","red","salmon","silver","tan",
             "teal","tomato","turquoise","violet","white","yellow"};
+
         void parse_input_to_bag_graph(const std::vector<std::string>& input){
             std::vector<std::pair<std::string,std::string>> parents_and_children_from_input;
             /* Split parents and children from input and build graph; parent bags contain children bags */
@@ -103,13 +149,68 @@ class RulesParser {
 			}
 			m_parent_to_child_graph.emplace(parent_bag,parent_contains_this_bag_x_times);
 			/* child -> parent */
-			std::unordered_map<std::string,int> child_is_inside_parent_x_times;
 			for (auto contain_pair: children_bags) {
-				child_is_inside_parent_x_times.emplace(parent_bag,contain_pair.second);
+				std::pair<std::string,int> blah(parent_bag,contain_pair.second);
+				m_child_to_parent_graph[contain_pair.first].insert(blah);
 			}
-			for (auto contain_pair: children_bags) {
-				m_child_to_parent_graph.emplace(contain_pair.first,child_is_inside_parent_x_times);
+		}
+		void depth_first_search_iterative(std::unordered_set<std::string>& has_been_explored, const std::string& bag_type_for_root_node,
+				bool parent_to_child=false){
+			std::list<std::string> stack;
+			stack.push_back(bag_type_for_root_node);
+			while (stack.size() > 0) {
+				std::string bag = stack.front();
+				stack.pop_front();
+				/* Continue if parents of bag haven't already been explored */
+				if (has_been_explored.count(bag) == 0) {
+					has_been_explored.emplace(bag);
+					try {
+						std::unordered_map<std::string,int>& next_node = (parent_to_child)
+							? m_parent_to_child_graph.at(bag)
+							: m_child_to_parent_graph.at(bag);
+						for(auto it = next_node.begin(); it != next_node.end(); it++){
+							/* If the next node's entries haven't been explored yet, add to stack */
+							if (has_been_explored.count(it->first) == 0) {
+								stack.push_back(it->first);
+							}
+						}
+					} catch (const std::out_of_range& e) {
+						/* Do nothing; bag is leaf on graph */
+					}
+				}
 			}
+		}
+		void depth_first_search_recursive(std::unordered_set<std::string>& has_been_explored, const std::string& bag,
+				bool parent_to_child=false){
+			has_been_explored.emplace(bag);
+			try {
+				std::unordered_map<std::string,int>& next_node = (parent_to_child)
+					? m_parent_to_child_graph.at(bag)
+					: m_child_to_parent_graph.at(bag);
+				for (auto it = next_node.begin(); it != next_node.end(); it++) {
+					if (has_been_explored.count(it->first) == 0) {
+						depth_first_search_recursive(has_been_explored, it->first, parent_to_child);
+					}
+				}
+			} catch (const std::out_of_range& e) {
+				/* Do nothing; bag is leaf on graph */
+			}
+		}
+		/* Function for solving day7 part 2 */
+		unsigned int recursive_bag_count(const std::string& bag, bool parent_to_child=false){
+			unsigned int bag_count = 0;
+			std::unordered_map<std::string,int>& next_node_map = (parent_to_child)
+				? m_parent_to_child_graph.at(bag)
+				: m_child_to_parent_graph.at(bag);
+			if (next_node_map.empty()) {
+				return 0;
+			} else {
+				for (auto it = next_node_map.begin(); it != next_node_map.end(); it++) {
+					int inc = it->second * (1 + recursive_bag_count(it->first, parent_to_child));
+					bag_count += inc;
+				}
+			}
+			return bag_count;
 		}
 };
 
@@ -120,19 +221,30 @@ std::chrono::high_resolution_clock::time_point t1 =
     std::chrono::high_resolution_clock::now();
 
 if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
-  /* day7 - part 1 */
-  std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
-  RulesParser stickler(input_line_by_line);
+	/* day7 - part 1 */
+	std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
+	RulesParser stickler(input_line_by_line);
+	stickler.dfs_child_to_parent_graph("shiny gold");
   } else if ((argc == 2) && (*argv[1] == '2')) {
-  /* day7 - part 2 */
-  //std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
-  std::cout << "Not yet implemented..." << std::endl;
+	  /* day7 - part 2 */
+	  std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
+	  RulesParser stickler(input_line_by_line);
+	  stickler.count_bags_contained_in("shiny gold");
 } else if ((argc == 2) && (*argv[1] == '3')) {
     /* developement */
-  std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_dev.txt");
-  RulesParser stickler(input_line_by_line);
+	std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_dev_p1.txt");
+	RulesParser stickler(input_line_by_line);
+	/* Iterative DFS */
+	stickler.dfs_child_to_parent_graph("shiny gold");
+	/* Count contained bags */
+	//stickler.count_bags_contained_in("shiny gold");
+} else if ((argc == 2) && (*argv[1] == '4')) {
+	/* developement */
+	std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_dev_p2.txt");
+	RulesParser stickler(input_line_by_line);
+	stickler.count_bags_contained_in("shiny gold");
 } else {
-  std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" for developement." << std::endl;
+  std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;
   return 1;
 }
 
