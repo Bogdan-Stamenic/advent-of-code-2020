@@ -5,6 +5,16 @@
 #include <unordered_set>
 #include <vector>
 
+/* Custom hash function to guarantee perfect hashing */
+struct MyHash {
+  auto operator()(const std::string &key) const -> size_t {
+	auto hash1 = std::hash<std::string>{}(key.substr(0,2));
+	unsigned int clr_idx = (key.size() == 3) ? 0 : key.size() - 4;
+	auto hash2 = std::hash<std::string>{}(key.substr(clr_idx,3));
+    return (hash1 ^ hash2);
+  }
+};
+
 class RulesParser {
     public:
         RulesParser(const std::vector<std::string>& input);
@@ -28,9 +38,9 @@ class RulesParser {
 
     private:
 		/* Graph representing input, e.g. light red bags contain 1 bright white bag, 2 muted yellow bags. */
-		std::unordered_map<std::string,std::unordered_map<std::string, int>> m_parent_to_child_graph;
+		std::unordered_map<std::string,std::unordered_map<std::string, int>,MyHash> m_parent_to_child_graph;
 		/* Inverse of the above graph, i.e. 2 muted yellow bags can be contained in light red bags*/
-		std::unordered_map<std::string,std::unordered_map<std::string, int>> m_child_to_parent_graph;
+		std::unordered_map<std::string,std::unordered_map<std::string, int>,MyHash> m_child_to_parent_graph;
 		/* Possible modifiers and colors found using bash cmds on input */
 		void parse_input_to_bag_graph(const std::vector<std::string>& input);
 		std::vector<std::pair<std::string,int>> parse_contained_bags(const std::string& children_str);
