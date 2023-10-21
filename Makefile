@@ -10,6 +10,9 @@ debug: $(debugBin)
 %_O3: %_O3.o file_to_vec.o
 	g++ -o $*_O3 file_to_vec.o $*_O3.o
 
+day7_O3: day7_O3.o file_to_vec.o rules_parser_O3.o
+	g++ -o day7_O3 file_to_vec.o rules_parser_O3.o day7_O3.o
+
 day6_O3: day6_O3.o file_to_vec.o customs_declaration_O3.o
 	g++ -o day6_O3 file_to_vec.o customs_declaration_O3.o day6_O3.o
 
@@ -18,6 +21,9 @@ day4_O3: day4_O3.o file_to_vec.o passport_processor_O3.o
 
 day1_O3: day1_O3.o file_to_vec.o find_sum_2020.o
 	g++ -o day1_O3 file_to_vec.o find_sum_2020.o day1_O3.o
+
+day7: day7.o file_to_vec.o rules_parser.o
+	g++ -o day7 file_to_vec.o rules_parser.o day7.o
 
 day6: day6.o file_to_vec.o customs_declaration.o
 	g++ -o day6 file_to_vec.o customs_declaration.o day6.o
