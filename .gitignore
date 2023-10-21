@@ -8,3 +8,4 @@ day*
 !/input/day*
 !/src/main/day*
 !/include/day*
+*.log
