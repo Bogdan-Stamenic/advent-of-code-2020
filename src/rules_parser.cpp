@@ -81,7 +81,8 @@ void RulesParser::parse_input_to_bag_graph(const std::vector<std::string>& input
 		unsigned int children_length = line.size() - (sep_phrase.size() + idx);
 		std::string parent_bag = line.substr(parent_start_idx, parent_length);
 		std::string children_str = line.substr(children_start_idx, children_length);
-		std::vector<std::pair<std::string,int>> children_bags = parse_contained_bags(children_str);
+		//std::vector<std::pair<std::string,int>> children_bags = parse_contained_bags(children_str);
+		std::vector<std::pair<std::string,int>> children_bags = better_parse_contained_bags(children_str);
 		parsed_bags_to_both_graphs(parent_bag,children_bags);
 	}
 	//std::cout << "parent -> child size : " << m_parent_to_child_graph.size() << std::endl;
@@ -122,6 +123,48 @@ std::vector<std::pair<std::string,int>> RulesParser::parse_contained_bags(const 
 	 * v = { {"faded blue",2},{"dotted black",6} }
 	 * */
 	return v;
+}
+
+/* Parse without any regex */
+std::vector<std::pair<std::string,int>> RulesParser::better_parse_contained_bags(const std::string& children_str) {
+	/* Starts off like this:
+	 * 5 faded blue bags, 6 dotted black bags.
+	 * */
+	if (children_str[0] == 'n') {
+		/* If children_str was "no other bags." */
+		std::vector<std::pair<std::string,int>> rules = {};
+		return rules;
+	} else if ((children_str[0] < '0') && (children_str[0] > '9')) {
+		throw std::runtime_error("something went wrong while parsing.");
+	}
+	unsigned int idx_fst=0;
+	unsigned int idx_mid=0;
+	unsigned int idx_lst=0;
+	std::vector<std::pair<std::string,int>> rules;
+	while (children_str.find(',', idx_lst+1) != std::string::npos) {
+		/* 5 faded blue bags, 6 do...
+		 * ^           ^    ^ 
+		 * idx_fst idx_mid  idx_lst
+		 * */
+		idx_lst = children_str.find(',', idx_lst+1);
+		idx_mid = children_str.rfind(' ', idx_lst);
+		std::string bag = children_str.substr(idx_fst + 2,idx_mid - (idx_fst+2));
+		int num_of_bag = std::stoi(children_str.substr(idx_fst,1)); //all nums < 10 => one digit in length
+		std::pair<std::string,int> new_rule(bag,num_of_bag);
+		rules.push_back(new_rule);
+		// Go to next iter.
+		idx_fst = idx_lst + 2;
+	}
+	idx_lst = children_str.find('.', idx_lst+1);
+	idx_mid = children_str.rfind(' ', idx_lst);
+	std::string bag = children_str.substr(idx_fst + 2,idx_mid - (idx_fst+2));
+	int num_of_bag = std::stoi(children_str.substr(idx_fst,1)); //all nums < 10 => one digit in length
+	std::pair<std::string,int> new_rule(bag,num_of_bag);
+	rules.push_back(new_rule);
+	/* Finally this:
+	 * v = { {"faded blue",2},{"dotted black",6} }
+	 * */
+	return rules;
 }
 
 void RulesParser::parsed_bags_to_both_graphs(const std::string& parent_bag, const std::vector<std::pair<std::string,int>>& children_bags) {

@@ -44,6 +44,7 @@ class RulesParser {
 		/* Possible modifiers and colors found using bash cmds on input */
 		void parse_input_to_bag_graph(const std::vector<std::string>& input);
 		std::vector<std::pair<std::string,int>> parse_contained_bags(const std::string& children_str);
+		std::vector<std::pair<std::string,int>> better_parse_contained_bags(const std::string& children_str);
 		void parsed_bags_to_both_graphs(const std::string& parent_bag, const std::vector<std::pair<std::string,int>>& children_bags);
 		void depth_first_search_iterative(std::unordered_set<std::string>& has_been_explored, const std::string& bag_type_for_root_node,
 				bool parent_to_child=false);

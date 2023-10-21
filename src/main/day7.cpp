@@ -31,6 +31,8 @@ if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
 	RulesParser stickler(input_line_by_line);
 	/* Iterative DFS */
 	stickler.dfs_child_to_parent_graph("shiny gold");
+	stickler.print_child_to_parent_for_testing();
+	stickler.print_parent_to_child_for_testing();
 	/* Count contained bags */
 	//stickler.count_bags_contained_in("shiny gold");
 } else if ((argc == 2) && (*argv[1] == '4')) {
