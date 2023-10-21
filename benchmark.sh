@@ -8,11 +8,11 @@ if [ -f ./$1 ]; then
 	if [ "$#" -eq 1 ]; then
 		hyperfine --warmup 10 --min-runs 15 --shell=none "./${1} 1" >> "$LOGFILE"
 		hyperfine --warmup 10 --min-runs 15 --shell=none "./${1} 2" >> "$LOGFILE"
-		hyperfine --warmup 10 --min-runs 15 --shell=none "./${1}_O3 1" >> "$LOGFILE"
-		hyperfine --warmup 10 --min-runs 15 --shell=none "./${1}_O3 2" >> "$LOGFILE"
+		hyperfine --warmup 10 --min-runs 100 --shell=none "./${1}_O3 1" >> "$LOGFILE"
+		hyperfine --warmup 10 --min-runs 100 --shell=none "./${1}_O3 2" >> "$LOGFILE"
 		echo "Done."
 	elif  [ "$#" -eq 2 ]; then
-		hyperfine --warmup 10 --min-runs 15 --shell=none "./${1}_O3 ${2}" >> "$LOGFILE"
+		hyperfine --warmup 10 --min-runs 100 --shell=none "./${1}_O3 ${2}" >> "$LOGFILE"
 		echo "Done."
 	else
 		echo "Something went wrong."

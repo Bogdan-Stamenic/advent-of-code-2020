@@ -38,6 +38,12 @@ day1: day1.o file_to_vec.o find_sum_2020.o
 %_O3.o: src/main/%.cpp include/%.h
 	g++ -O3 -o $*_O3.o -c -std=c++20 src/main/$*.cpp
 
+day7_O3.o: src/main/day7.cpp include/day7.h
+	g++ -O3 -o day7_O3.o -c -std=c++20 -fopenmp src/main/day7.cpp
+
+day7.o: src/main/day7.cpp include/day7.h
+	g++ -O3 -o day7.o -c -std=c++20 -fopenmp src/main/day7.cpp
+
 %.o: src/main/%.cpp include/%.h
 	g++ -g -c -std=c++20 src/main/$*.cpp
 

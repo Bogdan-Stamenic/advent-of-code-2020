@@ -188,6 +188,7 @@ unsigned int RulesParser::recursive_bag_count(const std::string& bag, bool paren
 	if (next_node_map.empty()) {
 		return 0;
 	} else {
+#pragma omp parallel for
 		for (auto it = next_node_map.begin(); it != next_node_map.end(); it++) {
 			int inc = it->second * (1 + recursive_bag_count(it->first, parent_to_child));
 			bag_count += inc;
