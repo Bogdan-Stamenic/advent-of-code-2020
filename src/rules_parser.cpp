@@ -51,7 +51,10 @@ void RulesParser::dfs_child_to_parent_graph(const std::string& bag_type_for_root
 	} else {
 		depth_first_search_iterative(has_been_explored, bag_type_for_root_node);
 	}
+#ifdef GPROF
+#else
 	std::cout << "Number of bags that contain at least one " << bag_type_for_root_node << " bag is " << (has_been_explored.size() - 1) << "." << std::endl;
+#endif
 }
 void RulesParser::dfs_parent_to_child_graph(const std::string& bag_type_for_root_node, bool recursive_dfs){
 	std::unordered_set<std::string> has_been_explored;
@@ -64,7 +67,10 @@ void RulesParser::dfs_parent_to_child_graph(const std::string& bag_type_for_root
 }
 void RulesParser::count_bags_contained_in(const std::string& bag_type_for_root_node){
 	unsigned int num_bags = recursive_bag_count(bag_type_for_root_node, true);
+#ifdef GPROF
+#else
 	std::cout << bag_type_for_root_node << " bag contains a total of " << num_bags << " inside." << std::endl;
+#endif
 }
 
 void RulesParser::parse_input_to_bag_graph(const std::vector<std::string>& input){

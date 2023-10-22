@@ -1,8 +1,12 @@
-runtimeBin=day1 day2 day3 day4 day5
+runtimeBin=day1_O3 day2_O3 day3_O3 day4_O3 day5_O3 day6_O3 day7_O3
+debugBin=day1 day2 day3 day4 day5 day6 day7
+profilerBin=day1_pg day2_pg day3_pg day4_pg day5_pg day6_pg day7_pg
 
 all: $(runtimeBin)
 
 debug: $(debugBin)
+
+profiler: $(profilerBin)
 
 %: %.o file_to_vec.o
 	g++ -o $* file_to_vec.o $*.o
