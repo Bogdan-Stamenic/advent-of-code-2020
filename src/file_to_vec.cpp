@@ -1,11 +1,9 @@
-#include <iostream>
+#include "../include/file_to_vec.h"
 #include <fstream>
-#include <vector>
+#include <iostream>
 #include <string>
 #include <stdexcept>
-
-//std::vector<int> file_to_int_vec(std::string file_name);
-//std::vector<std::string> file_to_string_vec(std::string file_name, char delim);
+#include <vector>
 
 std::vector<int> file_to_int_vec(std::string file_name)
 {
@@ -30,7 +28,7 @@ std::vector<int> file_to_int_vec(std::string file_name)
 }
 
 /* Read file line-by-line into vector. */
-std::vector<std::string> file_to_string_vec(std::string file_name, char delim = '\n')
+std::vector<std::string> file_to_string_vec(std::string file_name, char delim)
 {
 	std::ifstream input_stream;
 	std::string line;

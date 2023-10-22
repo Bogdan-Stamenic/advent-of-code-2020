@@ -1,5 +1,6 @@
 #include "../include/rules_parser.h"
 #include <iostream>
+#include <iostream>
 #include <list>
 #include <regex>
 #include <stdexcept>
@@ -82,7 +83,7 @@ void RulesParser::parse_input_to_bag_graph(const std::vector<std::string>& input
 		std::string parent_bag = line.substr(parent_start_idx, parent_length);
 		std::string children_str = line.substr(children_start_idx, children_length);
 		//std::vector<std::pair<std::string,int>> children_bags = parse_contained_bags(children_str);
-		std::vector<std::pair<std::string,int>> children_bags = better_parse_contained_bags(children_str);
+		std::vector<std::pair<std::string,int>> children_bags = no_regex_parse_contained_bags(children_str);
 		parsed_bags_to_both_graphs(parent_bag,children_bags);
 	}
 	//std::cout << "parent -> child size : " << m_parent_to_child_graph.size() << std::endl;
@@ -126,7 +127,7 @@ std::vector<std::pair<std::string,int>> RulesParser::parse_contained_bags(const 
 }
 
 /* Parse without any regex */
-std::vector<std::pair<std::string,int>> RulesParser::better_parse_contained_bags(const std::string& children_str) {
+std::vector<std::pair<std::string,int>> RulesParser::no_regex_parse_contained_bags(const std::string& children_str) {
 	/* Starts off like this:
 	 * 5 faded blue bags, 6 dotted black bags.
 	 * */

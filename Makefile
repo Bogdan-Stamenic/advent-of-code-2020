@@ -7,6 +7,9 @@ debug: $(debugBin)
 %: %.o file_to_vec.o
 	g++ -o $* file_to_vec.o $*.o
 
+%_pg: %_pg.o file_to_vec_pg.o
+	g++ -pg -o $*_pg file_to_vec_pg.o $*_pg.o
+
 %_O3: %_O3.o file_to_vec.o
 	g++ -o $*_O3 file_to_vec.o $*_O3.o
 
@@ -22,6 +25,9 @@ day4_O3: day4_O3.o file_to_vec.o passport_processor_O3.o
 day1_O3: day1_O3.o file_to_vec.o find_sum_2020.o
 	g++ -o day1_O3 file_to_vec.o find_sum_2020.o day1_O3.o
 
+day7_pg: day7_pg.o file_to_vec_pg.o rules_parser_pg.o
+	g++ -pg -o day7_pg file_to_vec_pg.o rules_parser_pg.o day7_pg.o
+
 day7: day7.o file_to_vec.o rules_parser.o
 	g++ -o day7 file_to_vec.o rules_parser.o day7.o
 
@@ -35,9 +41,6 @@ day1: day1.o file_to_vec.o find_sum_2020.o
 	g++ -o day1 file_to_vec.o find_sum_2020.o day1.o
 
 # Compile all files in debug-mode by default
-%_O3.o: src/main/%.cpp include/%.h
-	g++ -O3 -o $*_O3.o -c -std=c++20 src/main/$*.cpp
-
 day7_O3.o: src/main/day7.cpp include/day7.h
 	g++ -O3 -o day7_O3.o -c -std=c++20 -fopenmp src/main/day7.cpp
 
@@ -47,14 +50,20 @@ day7.o: src/main/day7.cpp include/day7.h
 %.o: src/main/%.cpp include/%.h
 	g++ -g -c -std=c++20 src/main/$*.cpp
 
-%_O3.o: src/%.cpp include/%.h
-	g++ -O3 -o $*_O3.o -c -std=c++20 src/$*.cpp
+%_pg.o: src/main/%.cpp include/%.h
+	g++ -g -D GPROF -c -std=c++20 src/main/$*.cpp -o $*_pg.o
+
+%_O3.o: src/main/%.cpp include/%.h
+	g++ -O3 -o $*_O3.o -c -std=c++20 src/main/$*.cpp
 
 %.o: src/%.cpp include/%.h
 	g++ -g -c -std=c++20 src/$*.cpp
 
-file_to_vec.o: src/file_to_vec.cpp
-	g++ -g -c -std=c++20 src/file_to_vec.cpp
+%_pg.o: src/%.cpp include/%.h
+	g++ -g -D GPROF -c -std=c++20 src/$*.cpp -o $*_pg.o
+
+%_O3.o: src/%.cpp include/%.h
+	g++ -O3 -o $*_O3.o -c -std=c++20 src/$*.cpp
 
 find_sum_2020.o: src/find_sum_2020.cpp
 	g++ -g -c -std=c++20 src/find_sum_2020.cpp

@@ -5,7 +5,11 @@ output.txt
 *~
 *.json
 day*
-!/input/day*
+!/input/*
 !/src/main/day*
 !/include/day*
 *.log
+input/gperf.cpp
+input/day7_gperf_input.txt
+gmon.out
+analysis.txt
