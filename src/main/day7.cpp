@@ -1,5 +1,6 @@
 #include "../../include/day7.h"
 #include "../../include/rules_parser.h"
+#include <chrono>
 #include <iostream>
 #include <list>
 #include <regex>
