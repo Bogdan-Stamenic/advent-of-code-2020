@@ -34,14 +34,14 @@ class AdapterArray {
 #endif
 		}
 		/* Number of ways to complete chain from idx */
-		long long int memoize_count_adapter_chains(int idx) {
+		int64_t memoize_count_adapter_chains(int idx) {
 			if (idx >= m_adapter_list.size()) throw std::out_of_range("idx was too large!");
 			if (idx == m_adapter_list.size() - 1) {
 				return 1;
 			} else if (m_num_ways_to_complete_chain_from_idx.count(idx) == 1) {
 				return m_num_ways_to_complete_chain_from_idx.at(idx);
 			}
-			long long int answer = 0;
+			int64_t answer = 0;
 			int jdx = idx + 1;
 			int jdx_last = (idx + 3 > m_adapter_list.size())
 				? m_adapter_list.size()
@@ -57,7 +57,7 @@ class AdapterArray {
 	private:
 		std::vector<bool> m_adapter_list{};
 		std::vector<int> m_jolts_distance_count = std::vector<int>(3,0);
-		std::unordered_map<int,long long int> m_num_ways_to_complete_chain_from_idx;
+		std::unordered_map<int,int64_t> m_num_ways_to_complete_chain_from_idx;
 		inline void check_chain_all_adapters_possible() {
 			for (auto it_adapter = m_adapter_list.begin(); it_adapter != m_adapter_list.end() - 3; it_adapter++) {
 				bool next_adapter_exists = std::any_of(it_adapter, it_adapter+3, [](bool adapter_exists){return adapter_exists;});
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 		/* day10 - part 2 */
 		std::vector<int> input_line_by_line = file_to_int_vec("input/day10_input.txt");
 		AdapterArray my_bag(input_line_by_line);
-		long long int answer = my_bag.memoize_count_adapter_chains(0);
+		int64_t answer = my_bag.memoize_count_adapter_chains(0);
 		std::cout << "Total possible adapter chains (day10_input.txt) : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '3')) {
 		/* developement */

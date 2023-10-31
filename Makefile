@@ -28,7 +28,7 @@ profiler: $(profilerBin)
 	g++ -O3 -o $*_O3.o -c -std=c++20 src/main/$*.cpp
 
 %.o: src/%.cpp include/%.h
-	g++ -g -c -std=c++20 src/$*.cpp
+	g++ -g -c -std=c++20 -fopenmp src/$*.cpp
 
 %_pg.o: src/%.cpp include/%.h
 	g++ -g -D GPROF -c -std=c++20 src/$*.cpp -o $*_pg.o
