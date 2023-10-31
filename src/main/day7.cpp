@@ -1,13 +1,7 @@
 #include "../../include/day7.h"
-#include "../../include/rules_parser.h"
 #include <chrono>
 #include <iostream>
-#include <list>
-#include <regex>
-#include <stdexcept>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 
@@ -24,6 +18,17 @@ int main(int argc, char *argv[]) {
 	std::chrono::high_resolution_clock::time_point t1 =
 		std::chrono::high_resolution_clock::now();
 
+#ifdef READ_AOC_INPUT_FROM_CMD 
+	if (argc==2) {
+		std::string filepath = std::string(argv[1]);
+		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
+		RulesParser stickler(input_line_by_line);
+		stickler.dfs_child_to_parent_graph("shiny gold");
+		stickler.count_bags_contained_in("shiny gold");
+	} else {
+		std::cout << "Usage:\n./day7 <input_file_path>" << std::endl;
+	}
+#else
 	if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
 		/* day7 - part 1 */
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day7_input.txt");
@@ -53,6 +58,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;
 		return 1;
 	}
+#endif
 
 /* Stop timer */
 std::chrono::high_resolution_clock::time_point t2 =

@@ -1,4 +1,5 @@
-#include <string>
-#include <vector>
-
-std::vector<std::string> file_to_string_vec(std::string file_name, char delim='\n');
+#ifndef DAY7_H
+#define DAY7_H
+#include "rules_parser.h"
+#include "file_to_vec.h"
+#endif

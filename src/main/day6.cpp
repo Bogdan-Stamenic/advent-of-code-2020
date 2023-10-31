@@ -1,4 +1,8 @@
 #include "../../include/day6.h"
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <vector>
 
 int main(int argc, char *argv[]) {
 /* Start timer */

@@ -1,7 +1,5 @@
-#include <chrono>
-#include <iostream>
-#include <string>
-#include <vector>
+#ifndef DAY6_H
+#define DAY6_H
+#include "file_to_vec.h"
 #include "customs_declaration.h"
-
-std::vector<std::string> file_to_string_vec(std::string file_name, char delim='\n');
+#endif

@@ -1,4 +1,8 @@
 #include "../../include/day3.h"
+#include <chrono>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 class DownhillToboggan {
 private:

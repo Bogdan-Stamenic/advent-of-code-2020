@@ -18,7 +18,7 @@ bool has_xmas_property(auto preamble_begin, auto preamble_end, int xmas_num) {
 }
 
 /* Solves day9 part 1 */
-unsigned int find_num_without_xmas_property(const std::vector<long long int>& xmas_cipher, int preamble_length=25) {
+unsigned int find_num_without_xmas_property(const std::vector<int64_t>& xmas_cipher, int preamble_length=25) {
 	if (xmas_cipher.size() < preamble_length) {
 		std::cout << xmas_cipher.size() << " !< " << preamble_length << std::endl;
 		throw std::invalid_argument("cipher was shorter than required preamble length.");
@@ -41,7 +41,7 @@ inline int sum_smallest_and_largest_nums(auto it_first_num, auto it_last_num) {
 }
 
 /* Solves day9 part 2 */
-int find_xmas_encryption_weakness(const std::vector<long long int>& xmas_cipher, int preamble_length=25) {
+int find_xmas_encryption_weakness(const std::vector<int64_t>& xmas_cipher, int preamble_length=25) {
 	int xmas_num = find_num_without_xmas_property(xmas_cipher, preamble_length);
 	auto it_first_num = xmas_cipher.begin();
 	auto it_last_num = it_first_num;
@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
 #ifdef GPROF /* Build for profiling */
 	for (int i = 0; i < 1000; i++){
 		std::vector<std::string> input_line_by_line = file_to_long_vec("input/day9_input.txt");
+		int answer = find_xmas_encryption_weakness(input_line_by_line);
 	}
 #else
 	/* Start timer */
@@ -78,22 +79,22 @@ int main(int argc, char *argv[]) {
 
 	if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
 		/* day9 - part 1 */
-		std::vector<long long int> input_line_by_line = file_to_long_vec("input/day9_input.txt");
+		std::vector<int64_t> input_line_by_line = file_to_long_vec("input/day9_input.txt");
 		int answer = find_num_without_xmas_property(input_line_by_line);
 		std::cout << "First number without XMAS property is : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '2')) {
 		/* day9 - part 2 */
-		std::vector<long long int> input_line_by_line = file_to_long_vec("input/day9_input.txt");
+		std::vector<int64_t> input_line_by_line = file_to_long_vec("input/day9_input.txt");
 		int answer = find_xmas_encryption_weakness(input_line_by_line);
 		std::cout << "XMAS encryption weakness is : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '3')) {
 		/* developement */
-		std::vector<long long int> input_line_by_line = file_to_long_vec("input/day9_dev.txt");
+		std::vector<int64_t> input_line_by_line = file_to_long_vec("input/day9_dev.txt");
 		int answer = find_num_without_xmas_property(input_line_by_line, 5);
 		std::cout << "First number without XMAS property is : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '4')) {
 		/* developement */
-		//std::vector<long long int> input_line_by_line = file_to_long_vec("input/day9_dev_p2.txt");
+		//std::vector<int64_t> input_line_by_line = file_to_long_vec("input/day9_dev_p2.txt");
 		std::cout << "Not implemented yet..." << std::endl;
 	} else {
 		std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;

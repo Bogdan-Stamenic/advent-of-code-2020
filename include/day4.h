@@ -1,9 +1,5 @@
-#include <chrono>
-#include <iostream>
-#include <string>
-#include <vector>
-#include "../include/passport_processor.h"
-
-std::vector<std::string> file_to_string_vec(std::string file_name, char delim='\n');
-//std::vector<int> file_to_int_vec(std::string file_name);
-
+#ifndef DAY4_H
+#define DAY4_H
+#include "passport_processor.h"
+#include "file_to_vec.h"
+#endif

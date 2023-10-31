@@ -1,3 +1,6 @@
+#ifndef SIMULATED_HANDHELD_DEBUGGER_H
+#define SIMULATED_HANDHELD_DEBUGGER_H
+
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -75,3 +78,5 @@ class HandheldDebugger {
 		const std::unordered_map<std::string,unsigned int> m_assembly_to_uint = {{"acc",0},{"jmp",1},{"nop",2}};
 		const std::unordered_map<unsigned int,std::string> m_uint_to_assembly = {{0,"acc"},{1,"jmp"},{2,"nop"}};
 };
+
+#endif

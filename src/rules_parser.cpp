@@ -53,7 +53,7 @@ void RulesParser::dfs_child_to_parent_graph(const std::string& bag_type_for_root
 	}
 #ifdef GPROF
 #else
-	std::cout << "Number of bags that contain at least one " << bag_type_for_root_node << " bag is " << (has_been_explored.size() - 1) << "." << std::endl;
+	std::cout << "Number of bags that contain at least one " << bag_type_for_root_node << " (day7 p1) bag is " << (has_been_explored.size() - 1) << "." << std::endl;
 #endif
 }
 void RulesParser::dfs_parent_to_child_graph(const std::string& bag_type_for_root_node, bool recursive_dfs){
@@ -69,7 +69,7 @@ void RulesParser::count_bags_contained_in(const std::string& bag_type_for_root_n
 	unsigned int num_bags = recursive_bag_count(bag_type_for_root_node, true);
 #ifdef GPROF
 #else
-	std::cout << bag_type_for_root_node << " bag contains a total of " << num_bags << " inside." << std::endl;
+	std::cout << bag_type_for_root_node << " bag contains (day7 p2) a total of " << num_bags << " inside." << std::endl;
 #endif
 }
 
@@ -238,7 +238,6 @@ unsigned int RulesParser::recursive_bag_count(const std::string& bag, bool paren
 	if (next_node_map.empty()) {
 		return 0;
 	} else {
-#pragma omp parallel for
 		for (auto it = next_node_map.begin(); it != next_node_map.end(); it++) {
 			int inc = it->second * (1 + recursive_bag_count(it->first, parent_to_child));
 			bag_count += inc;

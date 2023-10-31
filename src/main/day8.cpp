@@ -1,5 +1,4 @@
 #include "../../include/day8.h"
-#include "../../include/simulated_handheld_debugger.h"
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -10,7 +9,7 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < 1000; i++){
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day8_input.txt");
 		HandheldDebugger fixit(input_line_by_line);
-		fixit.simulate_handheld_and_halt_on_infinite_loop();
+		fixit.simulate_handheld_and_fix_infinite_loop();
 	}
 #else
 	/* Start timer */
@@ -34,8 +33,9 @@ int main(int argc, char *argv[]) {
 		fixit.simulate_handheld_and_halt_on_infinite_loop();
 	} else if ((argc == 2) && (*argv[1] == '4')) {
 		/* developement */
-		//std::vector<std::string> input_line_by_line = file_to_string_vec("input/day8_dev_p2.txt");
-		std::cout << "Not implemented yet..." << std::endl;
+		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day8_dev.txt");
+		HandheldDebugger fixit(input_line_by_line);
+		fixit.simulate_handheld_and_fix_infinite_loop();
 	} else {
 		std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;
 		return 1;

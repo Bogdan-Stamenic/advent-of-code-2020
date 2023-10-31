@@ -5,12 +5,13 @@
 #include <iterator>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #define MAX_SIMULATION_LOOPS 800 
 #define DEBUG false
 
-enum Seat {Floor, Empty, Occupied};
+enum class Seat {Floor, Empty, Occupied};
 typedef std::vector<std::vector<Seat>> FerrySeats;
 typedef std::vector<std::vector<std::vector<std::pair<int,int>>>> FerrySeatsNeighbours;
 
@@ -66,7 +67,9 @@ class SeatSimulator {
 						case '#':
 							m_ferry_seats[i][j] = Seat::Occupied;
 							break;
-						default: break;
+						case 'L':
+							/* Was initialized with L everywhere */
+							break;
 					};
 				}
 			}
@@ -79,7 +82,11 @@ class SeatSimulator {
 
 		bool simulation_step() {
 #if DEBUG
+			std::cout << "m_ferry_seats" << "\n";
 			print_m_ferry_seats();
+			std::cout << "m_last_ferry_seats_state" << "\n";
+			print_m_last_ferry_seats_state();
+			std::cout << "==================================================" << std::endl;
 #endif
 			m_last_ferry_seats_state = m_ferry_seats; //TODO: figure out why std::swap() causes problems
 			update();
@@ -88,7 +95,9 @@ class SeatSimulator {
 					vv_iterator<Seat>::end(m_ferry_seats),
 					vv_iterator<Seat>::begin(m_last_ferry_seats_state)
 					);
-			if (ffirst_simulation_pass) ffirst_simulation_pass = false;
+			if (ffirst_simulation_pass) {
+				ffirst_simulation_pass = false;
+			}
 			return is_steady_state;
 		}
 
@@ -103,8 +112,8 @@ class SeatSimulator {
 			}
 		}
 
-		inline void update_rule(int i, int j) {
-			const Seat& state = m_last_ferry_seats_state[i][j];
+		void update_rule(int i, int j) {
+			Seat state = m_last_ferry_seats_state[i][j];
 			int num_occupied = 0;
 			switch (state) {
 				case Seat::Empty:
@@ -122,10 +131,9 @@ class SeatSimulator {
 				case Seat::Floor:
 					return;
 			};
-			throw std::runtime_error("something unexpected happened");
 		}
 
-		inline int count_occupied_adjacent_seats(int i, int j) {
+		int count_occupied_adjacent_seats(int i, int j) {
 			/* Memoize indices for faster indexing in subsequent run */
 			if (ffirst_simulation_pass) {
 				std::vector<std::pair<int,int>> adj_seats;
@@ -197,8 +205,27 @@ class SeatSimulator {
 		return count;
 		}
 
-		void print_m_ferry_seats() {
+		void print_m_ferry_seats() const {
 			for (auto& row: m_ferry_seats) {
+				for (auto& seat: row) {
+					switch (seat) {
+						case Seat::Floor:
+							std::cout << '.';
+							break;
+						case Seat::Empty:
+							std::cout << 'L';
+							break;
+						case Seat::Occupied:
+							std::cout << '#';
+							break;
+					}
+				}
+				std::cout << '\n';
+			}
+			std::cout << std::endl;
+		}
+		void print_m_last_ferry_seats_state() const {
+			for (auto& row: m_last_ferry_seats_state) {
 				for (auto& seat: row) {
 					switch (seat) {
 						case Seat::Floor:
@@ -218,6 +245,7 @@ class SeatSimulator {
 			}
 			std::cout << std::endl;
 		}
+
 };
 
 int main(int argc, char *argv[]) {
@@ -230,6 +258,18 @@ int main(int argc, char *argv[]) {
 	std::chrono::high_resolution_clock::time_point t1 =
 		std::chrono::high_resolution_clock::now();
 
+#ifdef READ_AOC_INPUT_FROM_CMD 
+	if (argc==2) {
+		std::string filepath = std::string(argv[1]);
+		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
+		SeatSimulator ferry(input_line_by_line);
+		ferry.simulate_until_steady_state();
+		int answer = ferry.count_all_occupied_seats();
+		std::cout << "Occupied seats in steady state (day11 p1) is : " << answer << std::endl;
+	} else {
+		std::cout << "Usage:\n./day11 <input_file_path>" << std::endl;
+	}
+#else
 	if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
 		/* day11 - part 1 */
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day11_input.txt");
@@ -256,7 +296,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;
 		return 1;
 	}
-
+#endif
 	/* Stop timer */
 	std::chrono::high_resolution_clock::time_point t2 =
 		std::chrono::high_resolution_clock::now();

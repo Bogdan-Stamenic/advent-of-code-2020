@@ -13,3 +13,4 @@ input/gperf.cpp
 input/day7_gperf_input.txt
 gmon.out
 analysis.txt
+build/

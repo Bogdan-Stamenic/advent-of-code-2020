@@ -1,4 +1,10 @@
 #include "../../include/day2.h"
+#include <chrono>
+#include <cstring>
+#include <iostream>
+#include <iterator>
+#include <vector>
+
 
 void solve_part1(std::vector<std::string> passwords_and_policies_from_file) {
   int valid_count = 0;

@@ -29,11 +29,11 @@ std::vector<int> file_to_int_vec(std::string file_name)
 	return output_vec;
 }
 
-std::vector<long long int> file_to_long_vec(std::string file_name)
+std::vector<int64_t> file_to_long_vec(std::string file_name)
 {
 	std::ifstream input_stream;
 	std::string line;
-	std::vector<long long int> output_vec;
+	std::vector<int64_t> output_vec;
 	
 	input_stream.open(file_name);
 	if (input_stream.is_open()) {

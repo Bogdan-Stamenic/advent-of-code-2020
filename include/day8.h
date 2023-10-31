@@ -1,4 +1,5 @@
-#include <string>
-#include <vector>
-
-std::vector<std::string> file_to_string_vec(std::string file_name, char delim='\n');
+#ifndef DAY8_H
+#define DAY8_H
+#include "file_to_vec.h"
+#include "simulated_handheld_debugger.h"
+#endif

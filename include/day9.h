@@ -1,4 +1,4 @@
-#include <string>
-#include <vector>
-
-std::vector<long long int> file_to_long_vec(std::string file_name);
+#ifndef DAY9_H
+#define DAY9_H
+#include "file_to_vec.h"
+#endif
