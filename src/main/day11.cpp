@@ -12,6 +12,7 @@
 
 enum Seat {Floor, Empty, Occupied};
 typedef std::vector<std::vector<Seat>> FerrySeats;
+typedef std::vector<std::vector<std::vector<std::pair<int,int>>>> FerrySeatsNeighbours;
 
 class SeatSimulator {
 	public:
@@ -23,12 +24,14 @@ class SeatSimulator {
 			bool fsteady_state = false;
 			for (int i = 0; i < MAX_SIMULATION_LOOPS; i++) {
 				fsteady_state = simulation_step();
-				if (fsteady_state) return;
+				if (fsteady_state) {
+					return;
+				}
 			}
 			throw std::runtime_error("simulation didn't terminate");
 		}
 
-		inline int count_all_occupied_seats(){
+		inline int count_all_occupied_seats() {
 			auto it = vv_iterator<Seat>::begin(m_ferry_seats);
 			auto it_end = vv_iterator<Seat>::end(m_ferry_seats);
 			int count = 0;
@@ -42,14 +45,17 @@ class SeatSimulator {
 	private:
 		FerrySeats m_ferry_seats{};
 		FerrySeats m_last_ferry_seats_state{};
+		FerrySeatsNeighbours m_ferry_seats_neighbours{};
 		int m_column_num;
 		int m_row_num;
+		bool ffirst_simulation_pass = true;
 
 		void init_ferry_seats(const std::vector<std::string> input) {
 			m_column_num = input.front().size();
 			m_row_num = input.size();
-			std::vector<Seat> vec = std::vector<Seat>(m_column_num, Seat::Empty);
-			m_ferry_seats = FerrySeats(m_row_num,vec);
+			m_ferry_seats = FerrySeats(
+					m_row_num,std::vector<Seat>(m_column_num, Seat::Empty)
+					);
 			for (int i = 0; i < m_row_num; i++) {
 				for (int j = 0; j < m_column_num; j++) {
 					const char& space = input[i][j];
@@ -65,14 +71,16 @@ class SeatSimulator {
 				}
 			}
 			m_last_ferry_seats_state = m_ferry_seats;
+			m_ferry_seats_neighbours = FerrySeatsNeighbours(
+					m_row_num,std::vector<std::vector<std::pair<int,int>>>(
+						m_column_num,std::vector<std::pair<int,int>>{})
+					);
 		}
 
 		bool simulation_step() {
 #if DEBUG
 			print_m_ferry_seats();
 #endif
-			//m_last_ferry_seats_state.swap(m_ferry_seats);
-			//m_ferry_seats.swap(m_last_ferry_seats_state);
 			m_last_ferry_seats_state = m_ferry_seats; //TODO: figure out why std::swap() causes problems
 			update();
 			bool is_steady_state = std::equal(
@@ -80,6 +88,7 @@ class SeatSimulator {
 					vv_iterator<Seat>::end(m_ferry_seats),
 					vv_iterator<Seat>::begin(m_last_ferry_seats_state)
 					);
+			if (ffirst_simulation_pass) ffirst_simulation_pass = false;
 			return is_steady_state;
 		}
 
@@ -117,78 +126,80 @@ class SeatSimulator {
 		}
 
 		inline int count_occupied_adjacent_seats(int i, int j) {
-			std::vector<std::pair<int,int>> adj_seats;
-			/* I keep getting segfaults, soooooo lots of if-statements to stop it */
-			/* Normal case */
-			if (i > 0 && i < m_row_num - 1 && j > 0 && j < m_column_num - 1) {
-				adj_seats = {
-					{i-1,j-1}, {i-1,j}, {i-1,j+1},
-					{i,j-1}, /*{i,j}*/  {i,j+1},
-					{i+1,j-1}, {i+1,j}, {i+1,j+1}
-				};
-			}
-			/* Edge cases (as in along the edge) */
-			else if (i == 0  && j > 0 && j < m_column_num - 1) {
-				adj_seats = {
-					{i,j-1}, /*{i,j}*/  {i,j+1},
-					{i+1,j-1}, {i+1,j}, {i+1,j+1}
-				};
-			} else if (i > 0 && i < m_row_num - 1  && j == 0) {
-				adj_seats = {
-					{i-1,j}, {i-1,j+1},
-					/*{i,j}*/  {i,j+1},
-					{i+1,j}, {i+1,j+1}
-				};
-			} else if (i > 0 && i < m_row_num - 1  && j == m_column_num - 1) {
-				adj_seats = {
-					{i-1,j-1}, {i-1,j},
-					{i,j-1}, /*{i,j}*/ 
-					{i+1,j-1}, {i+1,j},
-				};
-			} else if (i == m_row_num - 1 && j > 0 && j < m_column_num - 1) {
-				adj_seats = {
-					{i-1,j-1}, {i-1,j}, {i-1,j+1},
-					{i,j-1}, /*{i,j}*/  {i,j+1},
-				};
-			}
-			/* Corner cases */
-			else if (i == 0  && j == 0) {
-				adj_seats = {
-					/*{i,j}*/  {i,j+1},
-					{i+1,j}, {i+1,j+1}
-				};
-			} else if (i == m_row_num - 1 && j == 0) {
-				adj_seats = {
-					{i-1,j}, {i-1,j+1},
-					/*{i,j}*/  {i,j+1},
-				};
-			} else if (i == 0 && j == m_column_num - 1) {
-				adj_seats = {
-					{i,j-1}, /*{i,j}*/ 
-					{i+1,j-1}, {i+1,j},
-				};
-			} else if (i == m_row_num - 1 && j == m_column_num - 1) {
-				adj_seats = {
-					{i-1,j-1}, {i-1,j},
-					{i,j-1}, /*{i,j}*/ 
-				};
-			} else {
-				std::cout << "i = " << i << ", j = " << j << std::endl;
-				throw std::logic_error("check occupied seat counting code");
+			/* Memoize indices for faster indexing in subsequent run */
+			if (ffirst_simulation_pass) {
+				std::vector<std::pair<int,int>> adj_seats;
+				/* Normal case */
+				if (i > 0 && i < m_row_num - 1 && j > 0 && j < m_column_num - 1) {
+					adj_seats = {
+						{i-1,j-1}, {i-1,j}, {i-1,j+1},
+						{i,j-1}, /*{i,j}*/  {i,j+1},
+						{i+1,j-1}, {i+1,j}, {i+1,j+1}
+					};
+				}
+				/* Edge cases (as in along the edge) */
+				else if (i == 0  && j > 0 && j < m_column_num - 1) {
+					adj_seats = {
+						{i,j-1}, /*{i,j}*/  {i,j+1},
+						{i+1,j-1}, {i+1,j}, {i+1,j+1}
+					};
+				} else if (i > 0 && i < m_row_num - 1  && j == 0) {
+					adj_seats = {
+						{i-1,j}, {i-1,j+1},
+						/*{i,j}*/  {i,j+1},
+						{i+1,j}, {i+1,j+1}
+					};
+				} else if (i > 0 && i < m_row_num - 1  && j == m_column_num - 1) {
+					adj_seats = {
+						{i-1,j-1}, {i-1,j},
+						{i,j-1}, /*{i,j}*/ 
+						{i+1,j-1}, {i+1,j},
+					};
+				} else if (i == m_row_num - 1 && j > 0 && j < m_column_num - 1) {
+					adj_seats = {
+						{i-1,j-1}, {i-1,j}, {i-1,j+1},
+						{i,j-1}, /*{i,j}*/  {i,j+1},
+					};
+				}
+				/* Corner cases */
+				else if (i == 0  && j == 0) {
+					adj_seats = {
+						/*{i,j}*/  {i,j+1},
+						{i+1,j}, {i+1,j+1}
+					};
+				} else if (i == m_row_num - 1 && j == 0) {
+					adj_seats = {
+						{i-1,j}, {i-1,j+1},
+						/*{i,j}*/  {i,j+1},
+					};
+				} else if (i == 0 && j == m_column_num - 1) {
+					adj_seats = {
+						{i,j-1}, /*{i,j}*/ 
+						{i+1,j-1}, {i+1,j},
+					};
+				} else if (i == m_row_num - 1 && j == m_column_num - 1) {
+					adj_seats = {
+						{i-1,j-1}, {i-1,j},
+						{i,j-1}, /*{i,j}*/ 
+					};
+				} else {
+					std::cout << "i = " << i << ", j = " << j << std::endl;
+					throw std::logic_error("check occupied seat counting code");
+				}
+				m_ferry_seats_neighbours[i][j] = adj_seats;
 			}
 			int count = 0;
-			for (auto [x, y]: adj_seats) {
+			for (const auto& [x, y]: m_ferry_seats_neighbours[i][j]) {
 				if(m_last_ferry_seats_state[x][y] == Seat::Occupied) {
 					count += 1;
 				}
 			}
-			//std::cout << count << std::endl;
-			return count;
+		return count;
 		}
-		
+
 		void print_m_ferry_seats() {
-			for (auto row: m_ferry_seats) {
-				for (auto seat: row) {
+			for (auto& row: m_ferry_seats) {
+				for (auto& seat: row) {
 					switch (seat) {
 						case Seat::Floor:
 							std::cout << '.';
