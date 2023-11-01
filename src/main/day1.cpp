@@ -36,8 +36,8 @@ int main(int argc, char *argv[]){
 
 #ifdef READ_AOC_INPUT_FROM_CMD 
 	if (argc==2) {
-		std::string filename = std::string(argv[1]);
-		std::vector<int> expenses = file_to_int_vec(filename);
+		std::string filepath = std::string(argv[1]);
+		std::vector<int> expenses = file_to_int_vec(filepath);
 		int sum_2020p1 = find_sum_2020p1(expenses);
 		int sum_2020p2 = find_sum_2020p2(expenses);
 		std::cout << "Answers to\n"

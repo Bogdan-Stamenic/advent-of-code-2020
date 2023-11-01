@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 	  const unsigned int answer_p2 = bob.count_valid_passports();
 	  std::cout << "Number of valid passports (day4-p2) is : " << answer_p2 << std::endl;
   } else {
-	  std::cout << "Usage:\n./day11 <input_file_path>" << std::endl;
+	  std::cout << "Usage:\n./day4 <input_file_path>" << std::endl;
   }
 #else
   /* Solution to 2020 Day 4 problem */

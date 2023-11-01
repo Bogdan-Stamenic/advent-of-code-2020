@@ -77,6 +77,18 @@ int main(int argc, char *argv[]) {
 	std::chrono::high_resolution_clock::time_point t1 =
 		std::chrono::high_resolution_clock::now();
 
+#ifdef READ_AOC_INPUT_FROM_CMD 
+  if (argc==2) {
+	  std::string filepath = std::string(argv[1]);
+	  std::vector<int64_t> input_line_by_line =  file_to_long_vec(filepath);
+	  int answer_p1 = find_num_without_xmas_property(input_line_by_line);
+	  std::cout << "First number without XMAS property is (day9-p1) : " << answer_p1 << std::endl;
+	  int answer_p2 = find_xmas_encryption_weakness(input_line_by_line);
+	  std::cout << "XMAS encryption weakness is (day9-p2) : " << answer_p2 << std::endl;
+  } else {
+	  std::cout << "Usage:\n./day9 <input_file_path>" << std::endl;
+  }
+#else
 	if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
 		/* day9 - part 1 */
 		std::vector<int64_t> input_line_by_line = file_to_long_vec("input/day9_input.txt");
@@ -100,6 +112,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;
 		return 1;
 	}
+#endif
 
 	/* Stop timer */
 	std::chrono::high_resolution_clock::time_point t2 =

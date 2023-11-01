@@ -72,6 +72,16 @@ int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point t1 =
       std::chrono::high_resolution_clock::now();
 
+#ifdef READ_AOC_INPUT_FROM_CMD 
+	if (argc==2) {
+		std::string filepath = std::string(argv[1]);
+		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
+		solve_part1(input_line_by_line);
+		solve_part2(input_line_by_line);
+	} else {
+		std::cout << "Usage:\n./day2 <input_file_path>" << std::endl;
+	}
+#else
   std::vector<std::string> passwords_and_policies_from_file =
       file_to_string_vec("input/day2_input.txt");
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
@@ -83,6 +93,7 @@ int main(int argc, char *argv[]) {
               << std::endl;
     return 1;
   }
+#endif
 
   std::chrono::high_resolution_clock::time_point t2 =
       std::chrono::high_resolution_clock::now();

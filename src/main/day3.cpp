@@ -72,6 +72,25 @@ int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point tic =
       std::chrono::high_resolution_clock::now();
 
+#ifdef READ_AOC_INPUT_FROM_CMD 
+	if (argc==2) {
+		std::string filepath = std::string(argv[1]);
+		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
+		DownhillToboggan sled(input_line_by_line);
+		std::cout << "day3-p1 : " << std::endl;
+		sled.downhill_toboggan(3, 1);
+		std::cout << "day3-p2 : " << std::endl;
+		unsigned int R1D1, R3D1, R5D1, R7D1, R1D2;
+		R1D1 = sled.downhill_toboggan(1, 1);
+		R3D1 = sled.downhill_toboggan(3, 1);
+		R5D1 = sled.downhill_toboggan(5, 1);
+		R7D1 = sled.downhill_toboggan(7, 1);
+		R1D2 = sled.downhill_toboggan(1, 2);
+		std::cout << "Product of all crashes : " << R1D1 * R3D1 * R5D1 * R7D1 * R1D2 << std::endl;
+	} else {
+		std::cout << "Usage:\n./day3 <input_file_path>" << std::endl;
+	}
+#else
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
     std::vector<std::string> downhill_slope =
         file_to_string_vec("input/day3_input.txt");
@@ -96,6 +115,7 @@ int main(int argc, char *argv[]) {
               << std::endl;
     return 1;
   }
+#endif
 
   std::chrono::high_resolution_clock::time_point toc =
       std::chrono::high_resolution_clock::now();

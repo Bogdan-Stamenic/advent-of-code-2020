@@ -23,18 +23,13 @@ class AdapterArray {
 		~AdapterArray() = default;
 		void solve_day10p1() {
 			count_adapter_jolt_distances();
-#ifndef GPROF
-			for (int idx = 0; idx < m_jolts_distance_count.size(); idx++) {
-				std::cout << m_jolts_distance_count[idx] << " adapters have jolts distance " << idx+1 << "\n";
-			}
-#endif
 			int answer = m_jolts_distance_count[0] * m_jolts_distance_count[2];
 #ifndef GPROF
-			std::cout << "Answer is : " << answer << std::endl;
+			std::cout << "day10-p1 : answer is " << answer << std::endl;
 #endif
 		}
 		/* Number of ways to complete chain from idx */
-		int64_t memoize_count_adapter_chains(int idx) {
+		int64_t memoize_count_adapter_chains(int idx=0) {
 			if (idx >= m_adapter_list.size()) throw std::out_of_range("idx was too large!");
 			if (idx == m_adapter_list.size() - 1) {
 				return 1;
@@ -89,7 +84,18 @@ int main(int argc, char *argv[]) {
 	/* Start timer */
 	std::chrono::high_resolution_clock::time_point t1 =
 		std::chrono::high_resolution_clock::now();
-
+#ifdef READ_AOC_INPUT_FROM_CMD 
+  if (argc==2) {
+	  std::string filepath = std::string(argv[1]);
+	  std::vector<int> input_line_by_line =  file_to_int_vec(filepath);
+	  AdapterArray my_bag(input_line_by_line);
+	  my_bag.solve_day10p1();
+	  int64_t answer_p2 = my_bag.memoize_count_adapter_chains();
+	  std::cout << "day10-p2 : total possible adapter chains in " << filepath << " : " << answer_p2 << std::endl;
+  } else {
+	  std::cout << "Usage:\n./day10 <input_file_path>" << std::endl;
+  }
+#else
 	if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
 		/* day10 - part 1 */
 		std::vector<int> input_line_by_line = file_to_int_vec("input/day10_input.txt");
@@ -99,7 +105,7 @@ int main(int argc, char *argv[]) {
 		/* day10 - part 2 */
 		std::vector<int> input_line_by_line = file_to_int_vec("input/day10_input.txt");
 		AdapterArray my_bag(input_line_by_line);
-		int64_t answer = my_bag.memoize_count_adapter_chains(0);
+		int64_t answer = my_bag.memoize_count_adapter_chains();
 		std::cout << "Total possible adapter chains (day10_input.txt) : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '3')) {
 		/* developement */
@@ -122,6 +128,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;
 		return 1;
 	}
+#endif
 
 	/* Stop timer */
 	std::chrono::high_resolution_clock::time_point t2 =

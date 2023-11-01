@@ -127,6 +127,25 @@ int main(int argc, char *argv[]) {
   std::chrono::high_resolution_clock::time_point t1 =
       std::chrono::high_resolution_clock::now();
 
+#ifdef READ_AOC_INPUT_FROM_CMD 
+	if (argc==2) {
+		std::string filepath = std::string(argv[1]);
+		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
+		std::vector<SeatPos> parsed_p1 = parse_seat_codesp1(input_line_by_line);
+		int highest = find_highest_id(parsed_p1);
+		std::cout << "The highest seat id is : " << highest << std::endl;
+
+		std::vector<int> parsed_p2 = parse_seat_codesp2(input_line_by_line);
+		std::cout << std::boolalpha;
+		SeatPos my_seat = find_my_seat(parsed_p2);
+		std::cout << "My seat is in row " << my_seat.row << " and column "
+			<< my_seat.column << "." << "\n";
+		std::cout << "And the corresponding seat id is: "
+			<< my_seat.row * 8 + my_seat.column << std::endl;
+	} else {
+		std::cout << "Usage:\n./day2 <input_file_path>" << std::endl;
+	}
+#else
   std::vector<std::string> seat_codes = file_to_string_vec("input/day5_input.txt");
   if (((argc == 2) && (*argv[1] == '1')) || (argc == 1)) {
     /* day5 - part 1 */
@@ -147,6 +166,7 @@ int main(int argc, char *argv[]) {
               << std::endl;
     return 1;
   }
+#endif
 
   std::chrono::high_resolution_clock::time_point t2 =
       std::chrono::high_resolution_clock::now();

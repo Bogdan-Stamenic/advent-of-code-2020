@@ -36,11 +36,3 @@ day4_pg: day4_pg.o file_to_vec_pg.o passport_processor_pg.o
 day4: day4.o file_to_vec.o passport_processor.o
 	g++ -o day4 file_to_vec.o passport_processor.o day4.o
 
-# Object files
-day7_O3.o: src/main/day7.cpp include/day7.h
-	g++ -O3 -o day7_O3.o -c -std=c++20 -fopenmp src/main/day7.cpp
-
-day7.o: src/main/day7.cpp include/day7.h
-	g++ -O3 -o day7.o -c -std=c++20 -fopenmp src/main/day7.cpp
-
-

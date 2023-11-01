@@ -19,11 +19,32 @@ add_compile_definitions(READ_AOC_INPUT_FROM_CMD)
 add_executable(day1 ./src/main/day1.cpp)
 target_link_libraries(day1 day1_util)
 
+add_executable(day2 ./src/main/day2.cpp)
+target_link_libraries(day2 day2_util)
+
+add_executable(day3 ./src/main/day3.cpp)
+target_link_libraries(day3 day3_util)
+
 add_executable(day4 ./src/main/day4.cpp)
 target_link_libraries(day4 day4_util)
 
+add_executable(day5 ./src/main/day5.cpp)
+target_link_libraries(day5 day5_util)
+
+add_executable(day6 ./src/main/day6.cpp)
+target_link_libraries(day6 day6_util)
+
 add_executable(day7 ./src/main/day7.cpp)
 target_link_libraries(day7 day7_util)
+
+add_executable(day8 ./src/main/day8.cpp)
+target_link_libraries(day8 day8_util)
+
+add_executable(day9 ./src/main/day9.cpp)
+target_link_libraries(day9 day9_util)
+
+add_executable(day10 ./src/main/day10.cpp)
+target_link_libraries(day10 day10_util)
 
 add_executable(day11 ./src/main/day11.cpp)
 target_link_libraries(day11 day1_util)
