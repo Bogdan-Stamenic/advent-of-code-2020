@@ -21,8 +21,15 @@ class SeatSimulator {
 			init_ferry_seats(input_line_by_line);
 		}
 		~SeatSimulator() = default;
-		void simulate_until_steady_state() {
+		void simulate_until_steady_state(bool fis_day11_part2=false) {
+			m_fis_day11_part2 = fis_day11_part2;
+			if (m_fis_day11_part2) {
+				m_threshold_occupied_seats = 5;
+			} else {
+				m_threshold_occupied_seats = 4;
+			}
 			bool fsteady_state = false;
+			m_ffirst_simulation_pass = true;
 			for (int i = 0; i < MAX_SIMULATION_LOOPS; i++) {
 				fsteady_state = simulation_step();
 				if (fsteady_state) {
@@ -49,7 +56,9 @@ class SeatSimulator {
 		FerrySeatsNeighbours m_ferry_seats_neighbours{};
 		int m_column_num;
 		int m_row_num;
-		bool ffirst_simulation_pass = true;
+		bool m_ffirst_simulation_pass = true;
+		bool m_fis_day11_part2 = false;
+		int m_threshold_occupied_seats = 4;
 
 		void init_ferry_seats(const std::vector<std::string> input) {
 			m_column_num = input.front().size();
@@ -68,7 +77,7 @@ class SeatSimulator {
 							m_ferry_seats[i][j] = Seat::Occupied;
 							break;
 						case 'L':
-							/* Was initialized with L everywhere */
+							/* Was initialized with Seat::Empty everywhere */
 							break;
 					};
 				}
@@ -84,9 +93,9 @@ class SeatSimulator {
 #if DEBUG
 			std::cout << "m_ferry_seats" << "\n";
 			print_m_ferry_seats();
-			std::cout << "m_last_ferry_seats_state" << "\n";
-			print_m_last_ferry_seats_state();
-			std::cout << "==================================================" << std::endl;
+//			std::cout << "m_last_ferry_seats_state" << "\n";
+//			print_m_last_ferry_seats_state();
+//			std::cout << "==================================================" << std::endl;
 #endif
 			m_last_ferry_seats_state = m_ferry_seats; //TODO: figure out why std::swap() causes problems
 			update();
@@ -95,8 +104,8 @@ class SeatSimulator {
 					vv_iterator<Seat>::end(m_ferry_seats),
 					vv_iterator<Seat>::begin(m_last_ferry_seats_state)
 					);
-			if (ffirst_simulation_pass) {
-				ffirst_simulation_pass = false;
+			if (m_ffirst_simulation_pass) {
+				m_ffirst_simulation_pass = false;
 			}
 			return is_steady_state;
 		}
@@ -124,7 +133,8 @@ class SeatSimulator {
 					return;
 				case Seat::Occupied:
 					num_occupied = count_occupied_adjacent_seats(i,j);
-					if (num_occupied >= 4) {
+					/* Threshold is either 4 for p1 or 5 for p2 */
+					if (num_occupied >= m_threshold_occupied_seats) {
 						m_ferry_seats[i][j] = Seat::Empty;
 					}
 					return;
@@ -135,64 +145,12 @@ class SeatSimulator {
 
 		int count_occupied_adjacent_seats(int i, int j) {
 			/* Memoize indices for faster indexing in subsequent run */
-			if (ffirst_simulation_pass) {
+			if (m_ffirst_simulation_pass) {
 				std::vector<std::pair<int,int>> adj_seats;
-				/* Normal case */
-				if (i > 0 && i < m_row_num - 1 && j > 0 && j < m_column_num - 1) {
-					adj_seats = {
-						{i-1,j-1}, {i-1,j}, {i-1,j+1},
-						{i,j-1}, /*{i,j}*/  {i,j+1},
-						{i+1,j-1}, {i+1,j}, {i+1,j+1}
-					};
-				}
-				/* Edge cases (as in along the edge) */
-				else if (i == 0  && j > 0 && j < m_column_num - 1) {
-					adj_seats = {
-						{i,j-1}, /*{i,j}*/  {i,j+1},
-						{i+1,j-1}, {i+1,j}, {i+1,j+1}
-					};
-				} else if (i > 0 && i < m_row_num - 1  && j == 0) {
-					adj_seats = {
-						{i-1,j}, {i-1,j+1},
-						/*{i,j}*/  {i,j+1},
-						{i+1,j}, {i+1,j+1}
-					};
-				} else if (i > 0 && i < m_row_num - 1  && j == m_column_num - 1) {
-					adj_seats = {
-						{i-1,j-1}, {i-1,j},
-						{i,j-1}, /*{i,j}*/ 
-						{i+1,j-1}, {i+1,j},
-					};
-				} else if (i == m_row_num - 1 && j > 0 && j < m_column_num - 1) {
-					adj_seats = {
-						{i-1,j-1}, {i-1,j}, {i-1,j+1},
-						{i,j-1}, /*{i,j}*/  {i,j+1},
-					};
-				}
-				/* Corner cases */
-				else if (i == 0  && j == 0) {
-					adj_seats = {
-						/*{i,j}*/  {i,j+1},
-						{i+1,j}, {i+1,j+1}
-					};
-				} else if (i == m_row_num - 1 && j == 0) {
-					adj_seats = {
-						{i-1,j}, {i-1,j+1},
-						/*{i,j}*/  {i,j+1},
-					};
-				} else if (i == 0 && j == m_column_num - 1) {
-					adj_seats = {
-						{i,j-1}, /*{i,j}*/ 
-						{i+1,j-1}, {i+1,j},
-					};
-				} else if (i == m_row_num - 1 && j == m_column_num - 1) {
-					adj_seats = {
-						{i-1,j-1}, {i-1,j},
-						{i,j-1}, /*{i,j}*/ 
-					};
+				if (m_fis_day11_part2) {
+					adj_seats = adjacent_seat_indices_p2(i,j);
 				} else {
-					std::cout << "i = " << i << ", j = " << j << std::endl;
-					throw std::logic_error("check occupied seat counting code");
+					adj_seats = adjacent_seat_indices_p1(i,j);
 				}
 				m_ferry_seats_neighbours[i][j] = adj_seats;
 			}
@@ -203,6 +161,94 @@ class SeatSimulator {
 				}
 			}
 		return count;
+		}
+
+		inline std::vector<std::pair<int,int>> adjacent_seat_indices_p1(int i, int j) {
+			std::vector<std::pair<int,int>> adj_seats;
+			/* Normal case */
+			if (i > 0 && i < m_row_num - 1 && j > 0 && j < m_column_num - 1) {
+				adj_seats = {
+					{i-1,j-1}, {i-1,j}, {i-1,j+1},
+					{i,j-1}, /*{i,j}*/  {i,j+1},
+					{i+1,j-1}, {i+1,j}, {i+1,j+1}
+				};
+			}
+			/* Edge cases (as in along the edge) */
+			else if (i == 0  && j > 0 && j < m_column_num - 1) {
+				adj_seats = {
+					{i,j-1}, /*{i,j}*/  {i,j+1},
+					{i+1,j-1}, {i+1,j}, {i+1,j+1}
+				};
+			} else if (i > 0 && i < m_row_num - 1  && j == 0) {
+				adj_seats = {
+					{i-1,j}, {i-1,j+1},
+					/*{i,j}*/  {i,j+1},
+					{i+1,j}, {i+1,j+1}
+				};
+			} else if (i > 0 && i < m_row_num - 1  && j == m_column_num - 1) {
+				adj_seats = {
+					{i-1,j-1}, {i-1,j},
+					{i,j-1}, /*{i,j}*/ 
+					{i+1,j-1}, {i+1,j},
+				};
+			} else if (i == m_row_num - 1 && j > 0 && j < m_column_num - 1) {
+				adj_seats = {
+					{i-1,j-1}, {i-1,j}, {i-1,j+1},
+					{i,j-1}, /*{i,j}*/  {i,j+1},
+				};
+			}
+			/* Corner cases */
+			else if (i == 0  && j == 0) {
+				adj_seats = {
+					/*{i,j}*/  {i,j+1},
+					{i+1,j}, {i+1,j+1}
+				};
+			} else if (i == m_row_num - 1 && j == 0) {
+				adj_seats = {
+					{i-1,j}, {i-1,j+1},
+					/*{i,j}*/  {i,j+1},
+				};
+			} else if (i == 0 && j == m_column_num - 1) {
+				adj_seats = {
+					{i,j-1}, /*{i,j}*/ 
+					{i+1,j-1}, {i+1,j},
+				};
+			} else if (i == m_row_num - 1 && j == m_column_num - 1) {
+				adj_seats = {
+					{i-1,j-1}, {i-1,j},
+					{i,j-1}, /*{i,j}*/ 
+				};
+			} else {
+				std::cout << "i = " << i << ", j = " << j << std::endl;
+				throw std::logic_error("check occupied seat counting code");
+			}
+			return adj_seats;
+		}
+
+		inline std::vector<std::pair<int,int>> adjacent_seat_indices_p2(int i_in, int j_in) {
+			std::vector<std::pair<int,int>> adj_seats;
+			auto are_idxs_in_bounds = [this](int i,int j){
+				return ((i >= 0) && (i <= m_row_num - 1) && (j >= 0) && (j <= m_column_num - 1));
+			};
+			std::vector<std::pair<int,int>> increment_pairs = {
+				{-1,-1}, {-1,0}, {-1,1},
+				{0,-1}, /*{0,0},*/ {0,1},
+				{1,-1}, {1,0}, {1,1},
+			};
+			/* Search all 8 directions to find an adjacent seat */
+			for (auto [i_inc,j_inc]: increment_pairs) {
+				int i = i_in + i_inc;
+				int j = j_in + j_inc;
+				while (are_idxs_in_bounds(i,j)) {
+					if(m_last_ferry_seats_state[i][j] != Seat::Floor) {
+						adj_seats.push_back(std::make_pair(i,j));
+						break;
+					}
+					i += i_inc;
+					j += j_inc;
+				}
+			}
+			return adj_seats;
 		}
 
 		void print_m_ferry_seats() const {
@@ -224,6 +270,7 @@ class SeatSimulator {
 			}
 			std::cout << std::endl;
 		}
+
 		void print_m_last_ferry_seats_state() const {
 			for (auto& row: m_last_ferry_seats_state) {
 				for (auto& seat: row) {
@@ -279,8 +326,12 @@ int main(int argc, char *argv[]) {
 		std::cout << "Occupied seats in steady state is : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '2')) {
 		/* day11 - part 2 */
-		//std::vector<std::string> input_line_by_line = file_to_string_vec("input/day11_input.txt");
-		std::cout << "Not yet implemented..." << std::endl;
+		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day11_input.txt");
+		SeatSimulator ferry(input_line_by_line);
+		bool is_part2=true;
+		ferry.simulate_until_steady_state(is_part2);
+		int answer = ferry.count_all_occupied_seats();
+		std::cout << "Occupied seats in steady state is : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '3')) {
 		/* developement */
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day11_dev.txt");
@@ -290,8 +341,12 @@ int main(int argc, char *argv[]) {
 		std::cout << "Occupied seats in steady state is : " << answer << std::endl;
 	} else if ((argc == 2) && (*argv[1] == '4')) {
 		/* developement */
-		//std::vector<std::string> input_dev1 = file_to_string_vec("input/day11_dev.txt");
-		std::cout << "Not yet implemented..." << std::endl;
+		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day11_dev.txt");
+		SeatSimulator ferry(input_line_by_line);
+		bool is_part2=true;
+		ferry.simulate_until_steady_state(is_part2);
+		int answer = ferry.count_all_occupied_seats();
+		std::cout << "Occupied seats in steady state is : " << answer << std::endl;
 	} else {
 		std::cout << "Error: Invalid argument. Must be \"1\" or \"2\" for solver or \"3\" or \"4\" for developement." << std::endl;
 		return 1;
