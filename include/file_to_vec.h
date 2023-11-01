@@ -1,5 +1,6 @@
 #ifndef FILE_TO_VEC_H
 #define FILE_TO_VEC_H
+#include <cstint>
 #include <vector>
 #include <string>
 

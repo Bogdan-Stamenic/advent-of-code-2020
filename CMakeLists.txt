@@ -1,11 +1,13 @@
 # Set the minimum required version of CMake
 cmake_minimum_required(VERSION 3.10)
-# Create a project named Tutorial
-project(advent-of-code-2020 VERSION 1.0)
 
+set(CMAKE_C_COMPILER gcc)
+set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Create a project named Tutorial
+project(advent-of-code-2020 VERSION 1.0)
 # Use configure_file to configure and copy TutorialConfig.h.in to
 # TutorialConfig.h
 #configure_file(TutorialConfig.h.in TutorialConfig.h)

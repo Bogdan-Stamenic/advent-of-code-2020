@@ -1,4 +1,5 @@
 #include "../include/file_to_vec.h"
+#include <cstint>
 #include <fstream>
 #include <iostream>
 #include <string>
