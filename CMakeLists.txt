@@ -62,6 +62,10 @@ add_executable(day11 ./src/main/day11.cpp)
 target_compile_options(day11 PUBLIC -g -O0) 
 target_link_libraries(day11 day11_util)
 
+add_executable(day12 ./src/main/day12.cpp)
+target_compile_options(day12 PUBLIC -g -O0) 
+target_link_libraries(day12 day12_util)
+
 # O3 optimized binaries
 add_executable(day1_O3 ./src/main/day1.cpp)
 target_compile_options(day1_O3 PUBLIC -O3) 
@@ -106,6 +110,10 @@ target_link_libraries(day10_O3 day10_util)
 add_executable(day11_O3 ./src/main/day11.cpp)
 target_compile_options(day11_O3 PUBLIC -O3) 
 target_link_libraries(day11_O3 day11_util)
+
+add_executable(day12_O3 ./src/main/day12.cpp)
+target_compile_options(day12_O3 PUBLIC -O3) 
+target_link_libraries(day12_O3 day12_util)
 
 
 
