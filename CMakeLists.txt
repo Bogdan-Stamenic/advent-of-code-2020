@@ -66,6 +66,10 @@ add_executable(day12 ./src/main/day12.cpp)
 target_compile_options(day12 PUBLIC -O3) 
 target_link_libraries(day12 day12_util)
 
+add_executable(day13 ./src/main/day13.cpp)
+target_compile_options(day13 PUBLIC -O3) 
+target_link_libraries(day13 day13_util)
+
 # Use target_include_directories to include header files
 target_include_directories(day1
 	PUBLIC "${PROJECT_BINARY_DIR}"

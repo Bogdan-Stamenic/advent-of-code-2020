@@ -1,5 +1,14 @@
 # Files with specific rules that don't conform to patterns in Makefile
 # Binaries
+day13_O3: day13_O3.o file_to_vec.o chinese_remainder_theorem_O3.o
+	g++ -o day13_O3 file_to_vec.o chinese_remainder_theorem_O3.o day13_O3.o
+
+day13_pg: day13_pg.o file_to_vec_pg.o chinese_remainder_theorem_pg.o
+	g++ -pg -o day13_pg file_to_vec_pg.o chinese_remainder_theorem_pg.o day13_pg.o
+
+day13: day13.o file_to_vec.o chinese_remainder_theorem.o
+	g++ -o day13 file_to_vec.o chinese_remainder_theorem.o day13.o
+
 day8_O3: day8_O3.o file_to_vec.o simulated_handheld_debugger_O3.o
 	g++ -o day8_O3 file_to_vec.o simulated_handheld_debugger_O3.o day8_O3.o
 
