@@ -3,12 +3,13 @@
 #include <chrono>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
 enum class ShipInstruction {North,South,East,West,Left,Right,Forward};
 
-int my_sin(int angle_degrees) {
+inline constexpr int my_sin(int angle_degrees) {
 	switch (angle_degrees) {
 		case 0:
 			return 0;
@@ -29,9 +30,9 @@ int my_sin(int angle_degrees) {
 	};
 }
 
-int my_cos(int angle_degrees) {
+inline constexpr int my_cos(int angle_degrees) {
 	/* cos() is even function */
-	switch (sgn(angle_degrees)*angle_degrees) {
+	switch (angle_degrees) {
 		case 0:
 			return 1;
 		case 90:
@@ -39,6 +40,12 @@ int my_cos(int angle_degrees) {
 		case 180:
 			return -1;
 		case 270:
+			return 0;
+		case -90:
+			return 0;
+		case -180:
+			return -1;
+		case -270:
 			return 0;
 		default:
 			throw std::invalid_argument("my_cos() expected {-270,-180,-90,0,90,180,270}");
@@ -89,7 +96,7 @@ class ShipNavigation {
 								m_ship_y_coord -= value;
 								break;
 							default:
-								throw std::runtime_error("unexpected ship direction" + std::to_string(m_ship_orientation_degrees));
+								throw std::runtime_error("unexpected ship direction " + std::to_string(m_ship_orientation_degrees));
 						};
 				};
 			}
@@ -130,6 +137,11 @@ class ShipNavigation {
 		}
 	private:
 		std::vector<std::pair<ShipInstruction,int>> m_instructions;
+		const std::unordered_map<std::string,ShipInstruction> m_string_to_shipinstruction = {
+			{"N",ShipInstruction::North}, {"S",ShipInstruction::South}, {"E",ShipInstruction::East},
+			{"W",ShipInstruction::West}, {"L",ShipInstruction::Left}, {"R",ShipInstruction::Right},
+			{"F",ShipInstruction::Forward}, 
+		};
 		int m_ship_orientation_degrees = 0;
 		int m_ship_x_coord = 0; /* + is east, - is west */
 		int m_ship_y_coord = 0; /* + is north, - is south*/
@@ -137,30 +149,11 @@ class ShipNavigation {
 		int m_waypoint_y_coord = 1;
 		void init_instrucions(std::vector<std::string> input) {
 			for(auto line: input) {
-				if (line.substr(0,1) == "N") {
-					std::pair<ShipInstruction,int> inst(ShipInstruction::North,std::stoi(line.substr(1, line.size() - 1)));
-					m_instructions.push_back(inst);
-				} else if (line.substr(0,1) == "S") {
-					std::pair<ShipInstruction,int> inst(ShipInstruction::South,std::stoi(line.substr(1, line.size() - 1)));
-					m_instructions.push_back(inst);
-				} else if (line.substr(0,1) == "E") {
-					std::pair<ShipInstruction,int> inst(ShipInstruction::East,std::stoi(line.substr(1, line.size() - 1)));
-					m_instructions.push_back(inst);
-				} else if (line.substr(0,1) == "W") {
-					std::pair<ShipInstruction,int> inst(ShipInstruction::West,std::stoi(line.substr(1, line.size() - 1)));
-					m_instructions.push_back(inst);
-				} else if (line.substr(0,1) == "L") {
-					std::pair<ShipInstruction,int> inst(ShipInstruction::Left,std::stoi(line.substr(1, line.size() - 1)));
-					m_instructions.push_back(inst);
-				} else if (line.substr(0,1) == "R") {
-					std::pair<ShipInstruction,int> inst(ShipInstruction::Right,std::stoi(line.substr(1, line.size() - 1)));
-					m_instructions.push_back(inst);
-				} else if (line.substr(0,1) == "F") {
-					std::pair<ShipInstruction,int> inst(ShipInstruction::Forward,std::stoi(line.substr(1, line.size() - 1)));
-					m_instructions.push_back(inst);
-				} else {
-					throw std::invalid_argument("something is wrong with the input");
-				}
+				std::pair<ShipInstruction,int> inst(
+						m_string_to_shipinstruction.at(line.substr(0, 1)),
+						std::stoi(line.substr(1, line.size() - 1))
+						);
+				m_instructions.push_back(inst);
 			}
 		}
 		void rotate_waypoint_around_ship(int ang_deg) {
