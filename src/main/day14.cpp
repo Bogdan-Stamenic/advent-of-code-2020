@@ -111,15 +111,16 @@ uint64_t memory_interpret(const std::vector<std::string>& input) {
 			for (auto c : line.substr(7)) {
 				smask <<= 1;
 				xmask_template <<= 1;
-				if (c == 'X') {
-					xmask_template |= 1;
-				} else {
-					smask |= (c == '1') ? 1 : 0;
-				}
+				switch (c) {
+					case '0': break;
+					case '1': smask |= 1; break;
+					case 'X': xmask_template |= 1; break;
+					default: throw std::invalid_argument("expected 0, 1, or X");
+				};
 			}
 			generate_xmasks(xmasks, xmask_template);//fills xmasks
 		} else {
-			int idx_first = line.find('[') + 1;//where '[' is
+			int idx_first = 4;//where '[' is
 			int adr_len = line.find(']') - idx_first;
 			uint64_t address = std::stol(line.substr(idx_first,adr_len));
 			idx_first = line.find('=') + 2;
