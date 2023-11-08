@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
 	  std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
 	  CustomsDeclaration cust(input_line_by_line);
 	  unsigned int yes_count_for_part1 = cust.count_at_least_one_person_said_yes();
-	  std::cout << "Yes count in input (part 1) : " << yes_count_for_part1 << std::endl;
+	  std::cout << yes_count_for_part1 << std::endl;
 	  unsigned int yes_count_for_part2 = cust.count_everyone_said_yes();
-	  std::cout << "Yes count in input (part 2) : " << yes_count_for_part2 << std::endl;
+	  std::cout << yes_count_for_part2 << std::endl;
   } else {
 	  std::cout << "Usage:\n./day6 <input_file_path>" << std::endl;
   }

@@ -21,11 +21,12 @@ class AdapterArray {
 			check_chain_all_adapters_possible();
 		}
 		~AdapterArray() = default;
+		
 		void solve_day10p1() {
 			count_adapter_jolt_distances();
 			int answer = m_jolts_distance_count[0] * m_jolts_distance_count[2];
 #ifndef GPROF
-			std::cout << "day10-p1 : answer is " << answer << std::endl;
+			std::cout << answer << std::endl;
 #endif
 		}
 		/* Number of ways to complete chain from idx */
@@ -91,7 +92,7 @@ int main(int argc, char *argv[]) {
 	  AdapterArray my_bag(input_line_by_line);
 	  my_bag.solve_day10p1();
 	  int64_t answer_p2 = my_bag.memoize_count_adapter_chains();
-	  std::cout << "day10-p2 : total possible adapter chains in " << filepath << " : " << answer_p2 << std::endl;
+	  std::cout << answer_p2 << std::endl;
   } else {
 	  std::cout << "Usage:\n./day10 <input_file_path>" << std::endl;
   }

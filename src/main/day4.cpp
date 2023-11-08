@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
 		  file_to_string_vec(filepath);
 	  PassportProcessor bob(passport_credentials_messy);
 	  const unsigned int answer = bob.count_passports_with_all_req_fields();
-	  std::cout << "Valid number of passports (day4-p1) is : " << answer << std::endl;
+	  std::cout << answer << std::endl;
 	  const unsigned int answer_p2 = bob.count_valid_passports();
-	  std::cout << "Number of valid passports (day4-p2) is : " << answer_p2 << std::endl;
+	  std::cout << answer_p2 << std::endl;
   } else {
 	  std::cout << "Usage:\n./day4 <input_file_path>" << std::endl;
   }

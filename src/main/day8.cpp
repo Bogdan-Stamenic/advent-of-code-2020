@@ -5,13 +5,6 @@
 #include <vector>
 
 int main(int argc, char *argv[]) {
-#ifdef GPROF /* Build for profiling */
-	for (int i = 0; i < 1000; i++){
-		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day8_input.txt");
-		HandheldDebugger fixit(input_line_by_line);
-		fixit.simulate_handheld_and_fix_infinite_loop();
-	}
-#else
 	/* Start timer */
 	std::chrono::high_resolution_clock::time_point t1 =
 		std::chrono::high_resolution_clock::now();
@@ -59,5 +52,4 @@ int main(int argc, char *argv[]) {
 		std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 	std::cout << "Duration: " << time_span.count() << "s" << std::endl;
 	return 0;
-#endif
 }

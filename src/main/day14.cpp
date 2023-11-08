@@ -3,8 +3,10 @@
 #include <cassert>
 #include <chrono>
 #include <cstdint>
+#include <cstdio>
 #include <exception>
 #include <iostream>
+#include <stdint.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -50,75 +52,53 @@ uint64_t value_interpret (const std::vector<std::string>& input) {
 	return accumulator;
 }
 
-
-/* TODO : add optimization for contiguous set of Xs */
-void generate_xmasks(std::vector<std::pair<uint64_t,uint64_t>>& xmasks, uint64_t xmask_template) {
-	if (xmask_template == 0) {return;}
-	uint64_t chk = 0;
-	std::vector<uint64_t> base_cases;
-	/* Count number of Xs */
-	for (int i = 0; i<36; i++) {
-		chk = (xmask_template >> i) & 1;
-		if (chk) {
-			base_cases.push_back(1 << i);
+uint64_t map(uint64_t xmask, uint64_t cbn) {
+	uint64_t bit = 0;
+	uint64_t out = 0;
+	for (uint64_t n = 0; n < 64; n++) {
+		while (!(xmask & (1ULL << bit))) {bit++;}
+		
+		if (cbn & (1ULL << n)) {
+			out |= (1ULL << bit);	
+		}
+		
+		xmask &= ~(1ULL << bit);
+		
+		if (xmask == 0) {
+			break;
 		}
 	}
-	uint64_t N = base_cases.size();
-	if (N > 12) {
-		throw std::runtime_error("infeasible number of base cases");
-	}
-	uint64_t bit = 1ULL;
-	/* All 1s in xmask_template represent floating bits 'X' => sets 1 in one mask 0 in other. */
-	uint64_t xset0 = 0ULL;
-	uint64_t xset1 = 0ULL;
-	int case_num = 0;
-	/* Use cbn=0..2^N-1 to represent all 2^N subsets of base_cases.
-	 * Each additional X doubles number of bit masks needed.*/
-	for (uint64_t cbn = 0; cbn < (1 << N); cbn++) {
-		xset0 = 0ULL;
-		xset1 = 0ULL;
-		case_num = 0;
-		for (uint64_t i=0; i < 36; i++) {
-			bit = (cbn >> i) & 1ULL;
-			if (bit) {
-				xset0 += base_cases[case_num];
-				case_num++;
-			} else if (xmask_template >> i & 1ULL) {
-				xset1 += base_cases[case_num];
-				case_num++;
-			}
-			if (case_num >= N) {
-				break;
-			}
-		}
-		xmasks.push_back(std::pair<uint64_t,uint64_t>(xset0,xset1));
-	}
+	return out;
 }
 
 // smask1 :          011110001101111000110110111001000001
 // xmask_template1 : 000001000010000011001000000000100000
 uint64_t memory_interpret(const std::vector<std::string>& input) {
-	uint64_t smask = 0ULL;
-	uint64_t xmask_template = 0ULL;
+	uint64_t zmask = 0ULL;
+	uint64_t omask = 0ULL;
+	uint64_t xmask = 0ULL;
+	uint64_t nx = 0ULL;
 	std::unordered_map<uint64_t,uint64_t> memory;
 	std::vector<std::pair<uint64_t,uint64_t>> xmasks;
 	for (const auto& line: input) {
 		if (line.substr(0,4) == "mask") {
 			// update mask
-			smask = 0;
-			xmask_template = 0;
+			zmask = 0;
+			omask = 0;
+			xmask = 0;
+			nx = 0;
 			xmasks.clear();
 			for (auto c : line.substr(7)) {
-				smask <<= 1;
-				xmask_template <<= 1;
+				zmask <<= 1;
+				omask <<= 1;
+				xmask <<= 1;
 				switch (c) {
-					case '0': break;
-					case '1': smask |= 1; break;
-					case 'X': xmask_template |= 1; break;
+					case '0': zmask |= 1; break;
+					case '1': omask |= 1; break;
+					case 'X': xmask |= 1; nx++; break;
 					default: throw std::invalid_argument("expected 0, 1, or X");
 				};
 			}
-			generate_xmasks(xmasks, xmask_template);//fills xmasks
 		} else {
 			int idx_first = 4;//where '[' is
 			int adr_len = line.find(']') - idx_first;
@@ -126,18 +106,21 @@ uint64_t memory_interpret(const std::vector<std::string>& input) {
 			idx_first = line.find('=') + 2;
 			int val_len = line.size() - idx_first;
 			uint64_t value = std::stol(line.substr(idx_first,val_len));
-			uint64_t new_address = 0ULL;
-			for (const auto& [xset0,xset1]: xmasks) {
+			uint64_t base_address = address | omask;
+			uint64_t xset0 = 0;
+			uint64_t xset1 = 0;
+			for (uint64_t cbn = 0; cbn < (1ULL << nx); cbn++) {
 				/* set 1s -> set some Xs to 0 -> set the other Xs to 1 */
-				new_address = ((address | smask) & ~xset0) | xset1;
-				memory[new_address] = value;
+				xset1 = map(xmask,cbn);
+				xset0 = xset1 ^ xmask;
+				uint64_t addr = (base_address & ~xset0) | xset1;
+				memory[addr] = value;
 			}
 		}
 	}
 	uint64_t accumulator = 0ULL;
 	for (auto [adr,val]: memory) {
 		accumulator += val;
-		//printf("%#lx\n",val);
 	}
 	return accumulator;
 }
@@ -149,9 +132,12 @@ int main(int argc, char *argv[]) {
 
 #ifdef READ_AOC_INPUT_FROM_CMD 
 	if (argc==2) {
-		//std::string filepath = std::string(argv[1]);
-		//std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
-		std::cout << "Not yet implemented..." << std::endl;
+		std::string filepath = std::string(argv[1]);
+		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
+		uint64_t answer_p1 = value_interpret(input_line_by_line);
+		uint64_t answer_p2 = memory_interpret(input_line_by_line);
+		std::cout << answer_p1 << std::endl;
+		std::cout << answer_p2 << std::endl;
 	} else {
 		std::cout << "Usage:\n./day14 <input_file_path>" << std::endl;
 	}
@@ -161,20 +147,20 @@ int main(int argc, char *argv[]) {
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day14_input.txt");
 		uint64_t answer = value_interpret(input_line_by_line);
 		std::cout << answer << std::endl;
-		//13496669152158
+		// answer 13496669152158
 	} else if ((argc == 2) && (*argv[1] == '2')) {
 		/* day14 - part 2 */
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day14_input.txt");
 		uint64_t answer = memory_interpret(input_line_by_line);
 		std::cout << answer << std::endl;
-		// tyler569 : 3278997609887
-		// me : 430348104736
+		// answer : 3278997609887
 	} else if ((argc == 2) && (*argv[1] == '3')) {
 		/* developement */
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day14_dev1.txt");
 		value_interpret(input_line_by_line);
 	} else if ((argc == 2) && (*argv[1] == '4')) {
 		/* developement */
+		//std::vector<std::string> input_line_by_line = file_to_string_vec("input/day14_dev2.txt");
 		std::vector<std::string> input_line_by_line = file_to_string_vec("input/day14_dev2.txt");
 		uint64_t answer = memory_interpret(input_line_by_line);
 		std::cout << answer << std::endl;

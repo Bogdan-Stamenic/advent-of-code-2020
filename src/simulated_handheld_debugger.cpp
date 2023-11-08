@@ -133,12 +133,14 @@ HandheldDebugger::HandheldDebugger(const std::vector<std::string>& input_line_by
 
 /* Solves day8 part 1 */
 void HandheldDebugger::simulate_handheld_and_halt_on_infinite_loop(){
+	m_gameboy.reset_handheld_state();
 	bool VERBOSE = true;
 	int boot_status = m_gameboy.try_boot(VERBOSE);
 }
 
 /* Solves day8 part 2 */
 void HandheldDebugger::simulate_handheld_and_fix_infinite_loop(){
+	m_gameboy.reset_handheld_state();
 	int boot_status = m_gameboy.try_boot();
 	StackTrace stacktrace = m_gameboy.get_m_stacktrace();
 	std::vector<bool> cmd_has_been_visited = m_gameboy.get_m_cmd_has_been_visited();

@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-std::unordered_map<char, int> decoder({{'F', 0}, {'B', 1}, {'L', 0}, {'R', 1}});
+const std::unordered_map<char, int> decoder({{'F', 0}, {'B', 1}, {'L', 0}, {'R', 1}});
 
 struct SeatPos {
   unsigned int row;
@@ -18,7 +18,7 @@ int decode_row(std::string row_code) {
   unsigned int num = 64;
   unsigned int sum = 0;
   for (auto a : row_code) {
-    sum += decoder[a] * num;
+    sum += decoder.at(a) * num;
     // std::cout << "sum : " << sum << std::endl;
     num = num >> 1;
   }
@@ -30,7 +30,7 @@ int decode_column(std::string column_code) {
   unsigned int num = 4;
   unsigned int sum = 0;
   for (auto a : column_code) {
-    sum += decoder[a] * num;
+    sum += decoder.at(a) * num;
     num = num >> 1;
   }
   return sum;
@@ -132,16 +132,11 @@ int main(int argc, char *argv[]) {
 		std::string filepath = std::string(argv[1]);
 		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
 		std::vector<SeatPos> parsed_p1 = parse_seat_codesp1(input_line_by_line);
-		int highest = find_highest_id(parsed_p1);
-		std::cout << "The highest seat id is : " << highest << std::endl;
-
+		int answer_p1 = find_highest_id(parsed_p1);
+		std::cout << answer_p1 << std::endl;
 		std::vector<int> parsed_p2 = parse_seat_codesp2(input_line_by_line);
-		std::cout << std::boolalpha;
 		SeatPos my_seat = find_my_seat(parsed_p2);
-		std::cout << "My seat is in row " << my_seat.row << " and column "
-			<< my_seat.column << "." << "\n";
-		std::cout << "And the corresponding seat id is: "
-			<< my_seat.row * 8 + my_seat.column << std::endl;
+		std::cout << my_seat.row * 8 + my_seat.column << std::endl;
 	} else {
 		std::cout << "Usage:\n./day2 <input_file_path>" << std::endl;
 	}

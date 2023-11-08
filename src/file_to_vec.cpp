@@ -21,12 +21,6 @@ std::vector<int> file_to_int_vec(std::string file_name)
 	}else{
 		throw std::logic_error{"Error: file couldn't be read."};
 	}	
-#ifdef GPROF
-#else
-	if (!output_vec.empty()) {
-		std::cout << "Successfully inputted \"" << file_name << "\"." << std::endl;
-	}
-#endif
 	return output_vec;
 }
 
@@ -45,12 +39,6 @@ std::vector<int64_t> file_to_long_vec(std::string file_name)
 	}else{
 		throw std::logic_error{"Error: file couldn't be read."};
 	}	
-#ifdef GPROF
-#else
-	if (!output_vec.empty()) {
-		std::cout << "Successfully inputted \"" << file_name << "\"." << std::endl;
-	}
-#endif
 	return output_vec;
 }
 
@@ -70,11 +58,5 @@ std::vector<std::string> file_to_string_vec(std::string file_name, char delim)
 	}else{
 		throw std::logic_error("Error: file couldn't be read.");
 	}	
-#ifdef GPROF
-#else
-	if (!output_vec.empty()) {
-		std::cout << "Successfully inputted \"" << file_name << "\"." << std::endl;
-	}
-#endif
 	return output_vec;
 }

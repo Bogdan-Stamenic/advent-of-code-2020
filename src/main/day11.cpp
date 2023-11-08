@@ -30,6 +30,8 @@ class SeatSimulator {
 			}
 			bool fsteady_state = false;
 			m_ffirst_simulation_pass = true;
+			m_ferry_seats = m_seats;
+			m_last_ferry_seats = m_seats;
 			for (int i = 0; i < MAX_SIMULATION_LOOPS; i++) {
 				fsteady_state = simulation_step();
 				if (fsteady_state) {
@@ -51,8 +53,9 @@ class SeatSimulator {
 			return count;
 		}
 	private:
+		FerrySeats m_seats{}; /* seat arangement from input */
 		FerrySeats m_ferry_seats{};
-		FerrySeats m_last_ferry_seats_state{};
+		FerrySeats m_last_ferry_seats{};
 		FerrySeatsNeighbours m_ferry_seats_neighbours{};
 		int m_column_num;
 		int m_row_num;
@@ -63,7 +66,7 @@ class SeatSimulator {
 		void init_ferry_seats(const std::vector<std::string> input) {
 			m_column_num = input.front().size();
 			m_row_num = input.size();
-			m_ferry_seats = FerrySeats(
+			m_seats = FerrySeats(
 					m_row_num,std::vector<Seat>(m_column_num, Seat::Empty)
 					);
 			for (int i = 0; i < m_row_num; i++) {
@@ -71,10 +74,10 @@ class SeatSimulator {
 					const char& space = input[i][j];
 					switch (space) {
 						case '.':
-							m_ferry_seats[i][j] = Seat::Floor;
+							m_seats[i][j] = Seat::Floor;
 							break;
 						case '#':
-							m_ferry_seats[i][j] = Seat::Occupied;
+							m_seats[i][j] = Seat::Occupied;
 							break;
 						case 'L':
 							/* Was initialized with Seat::Empty everywhere */
@@ -82,7 +85,8 @@ class SeatSimulator {
 					};
 				}
 			}
-			m_last_ferry_seats_state = m_ferry_seats;
+			m_ferry_seats = m_seats;
+			m_last_ferry_seats = m_seats;
 			m_ferry_seats_neighbours = FerrySeatsNeighbours(
 					m_row_num,std::vector<std::vector<std::pair<int,int>>>(
 						m_column_num,std::vector<std::pair<int,int>>{})
@@ -93,16 +97,16 @@ class SeatSimulator {
 #if DEBUG
 			std::cout << "m_ferry_seats" << "\n";
 			print_m_ferry_seats();
-//			std::cout << "m_last_ferry_seats_state" << "\n";
-//			print_m_last_ferry_seats_state();
+//			std::cout << "m_last_ferry_seats" << "\n";
+//			print_m_last_ferry_seats();
 //			std::cout << "==================================================" << std::endl;
 #endif
-			m_last_ferry_seats_state = m_ferry_seats; //TODO: figure out why std::swap() causes problems
+			m_last_ferry_seats = m_ferry_seats; //TODO: figure out why std::swap() causes problems
 			update();
 			bool is_steady_state = std::equal(
 					vv_iterator<Seat>::begin(m_ferry_seats),
 					vv_iterator<Seat>::end(m_ferry_seats),
-					vv_iterator<Seat>::begin(m_last_ferry_seats_state)
+					vv_iterator<Seat>::begin(m_last_ferry_seats)
 					);
 			if (m_ffirst_simulation_pass) {
 				m_ffirst_simulation_pass = false;
@@ -122,7 +126,7 @@ class SeatSimulator {
 		}
 
 		void update_rule(int i, int j) {
-			Seat state = m_last_ferry_seats_state[i][j];
+			Seat state = m_last_ferry_seats[i][j];
 			int num_occupied = 0;
 			switch (state) {
 				case Seat::Empty:
@@ -156,7 +160,7 @@ class SeatSimulator {
 			}
 			int count = 0;
 			for (const auto& [x, y]: m_ferry_seats_neighbours[i][j]) {
-				if(m_last_ferry_seats_state[x][y] == Seat::Occupied) {
+				if(m_last_ferry_seats[x][y] == Seat::Occupied) {
 					count += 1;
 				}
 			}
@@ -240,7 +244,7 @@ class SeatSimulator {
 				int i = i_in + i_inc;
 				int j = j_in + j_inc;
 				while (are_idxs_in_bounds(i,j)) {
-					if(m_last_ferry_seats_state[i][j] != Seat::Floor) {
+					if(m_last_ferry_seats[i][j] != Seat::Floor) {
 						adj_seats.push_back(std::make_pair(i,j));
 						break;
 					}
@@ -271,8 +275,8 @@ class SeatSimulator {
 			std::cout << std::endl;
 		}
 
-		void print_m_last_ferry_seats_state() const {
-			for (auto& row: m_last_ferry_seats_state) {
+		void print_m_last_ferry_seats() const {
+			for (auto& row: m_last_ferry_seats) {
 				for (auto& seat: row) {
 					switch (seat) {
 						case Seat::Floor:
@@ -311,8 +315,12 @@ int main(int argc, char *argv[]) {
 		std::vector<std::string> input_line_by_line = file_to_string_vec(filepath);
 		SeatSimulator ferry(input_line_by_line);
 		ferry.simulate_until_steady_state();
-		int answer = ferry.count_all_occupied_seats();
-		std::cout << "Occupied seats in steady state (day11 p1) is : " << answer << std::endl;
+		int answer_p1 = ferry.count_all_occupied_seats();
+		bool is_part2 = true;
+		ferry.simulate_until_steady_state(is_part2);
+		int answer_p2 = ferry.count_all_occupied_seats();
+		std::cout << answer_p1 << std::endl;
+		std::cout << answer_p2 << std::endl;
 	} else {
 		std::cout << "Usage:\n./day11 <input_file_path>" << std::endl;
 	}
