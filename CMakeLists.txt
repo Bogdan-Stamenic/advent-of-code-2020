@@ -74,6 +74,10 @@ add_executable(day14 ./src/main/day14.cpp)
 target_compile_options(day14 PUBLIC -O3) 
 target_link_libraries(day14 day14_util)
 
+add_executable(day15 ./src/main/day15.cpp)
+target_compile_options(day15 PUBLIC -O3) 
+target_link_libraries(day15 day15_util)
+
 # Use target_include_directories to include header files
 # Use target_include_directories to include header files
 target_include_directories(day1

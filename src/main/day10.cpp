@@ -26,7 +26,7 @@ class AdapterArray {
 			count_adapter_jolt_distances();
 			int answer = m_jolts_distance_count[0] * m_jolts_distance_count[2];
 #ifndef GPROF
-			std::cout << answer << std::endl;
+			std::cout <<  answer << std::endl;
 #endif
 		}
 		/* Number of ways to complete chain from idx */
