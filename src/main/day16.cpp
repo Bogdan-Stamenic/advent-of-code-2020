@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <exception>
 #include <iostream>
+#include <ranges>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -65,31 +66,33 @@ class TicketTranslator {
 		}
 
 		void init_rules(std::vector<std::string> input){
-			std::vector<std::string> input_rules;
-			std::vector<std::string> input_my_ticket;
-			std::vector<std::string> input_nearby_tickets;
-			int which_vec = 0;
 			/* Split into 3 chunks */
+			int which_chunk = 0;
+			int rules_end = 0;
+			int my_ticket_end = 0;
+			int line_nr = 0;
 			for (const auto& line : input) {
 				bool cond = (line.find(':') == std::string::npos)
 					&& (line.find(',') == std::string::npos);
 				if (cond) {
-					which_vec++;
-					continue;
+					switch(which_chunk) {
+						case 0:
+							rules_end = line_nr;
+							break;
+						case 1:
+							my_ticket_end = line_nr;
+							break;
+						default: throw std::runtime_error("Uh-oh");
+					};
+					which_chunk++;
 				}
-				switch(which_vec) {
-					case 0:
-						input_rules.push_back(line);
-						break;
-					case 1:
-						input_my_ticket.push_back(line);
-						break;
-					case 2:
-						input_nearby_tickets.push_back(line);
-						break;
-					default: throw std::runtime_error("Uh-oh");
-				};
+				if (which_chunk > 1) {break;}
+				line_nr++;
 			}
+			//std::vector<std::string> input_rules;
+			auto input_rules = std::ranges::subrange(input.begin(),input.begin() + rules_end - 1);
+			auto input_my_ticket = std::ranges::subrange(input.begin() + rules_end + 1, input.begin() + my_ticket_end - 1);
+			auto input_nearby_tickets = std::ranges::subrange(input.begin() + my_ticket_end + 1, input.end());
 			/* 1: Ticket rules */
 			for (const auto& line : input_rules) {
 				/* Figure out where formatting symbols are */
@@ -113,7 +116,7 @@ class TicketTranslator {
 			/* 2: My ticket */
 			int idx_fst = 0;
 			int idx_lst = 0;
-			std::string& ticket_info = input_my_ticket.at(1);
+			std::string& ticket_info = input_my_ticket[1];
 			while (ticket_info.find(',', idx_fst) != std::string::npos) {
 				idx_lst = ticket_info.find(',', idx_fst);
 				int num = std::stoi(ticket_info.substr(idx_fst,idx_lst - idx_fst));
